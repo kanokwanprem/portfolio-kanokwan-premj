@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanokwan Premjit — UX/UI Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--white:#FAFAF8;--cream:#F0EDE4;--cream-mid:#E8E3D8;--purple-light:#EAE6FA;--purple-mid:#C9C0F0;--purple:#7B6FCD;--purple-deep:#4A3FA0;--ink:#1A1830;--ink-mid:#3D3960;--muted:#8C88A8;--border:rgba(123,111,205,.15)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Kanit',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+.cursor-dot{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;width:8px;height:8px;background:var(--purple);border-radius:50%;transform:translate(-50%,-50%);transition:transform .1s,background .2s}
+.cursor-ring{position:fixed;top:0;left:0;z-index:9998;pointer-events:none;width:36px;height:36px;border:1.5px solid var(--purple);border-radius:50%;transform:translate(-50%,-50%);transition:transform .35s cubic-bezier(.23,1,.32,1),width .3s,height .3s,border-color .3s;opacity:.6}
+body.chover .cursor-ring{width:60px;height:60px;border-color:var(--purple-deep);opacity:1}
+body.chover .cursor-dot{transform:translate(-50%,-50%) scale(2);background:var(--purple-deep)}
+
+/* PAGES */
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.5rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s}
+nav.scrolled{background:rgba(250,250,248,.9);backdrop-filter:blur(16px);padding:1rem 4rem;border-bottom:1px solid var(--border)}
+.nav-logo{font-weight:600;font-size:1.05rem;letter-spacing:.08em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.5rem;cursor:none}
+.nav-logo span{color:var(--purple)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-weight:300;font-size:.9rem;letter-spacing:.05em;color:var(--ink-mid);text-decoration:none;transition:color .2s;position:relative;cursor:none}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:100%;height:1px;background:var(--purple);transition:right .3s cubic-bezier(.23,1,.32,1)}
+.nav-links a:hover{color:var(--purple)}
+.nav-links a:hover::after{right:0}
+.nav-cta{font-family:'Kanit',sans-serif;font-weight:400;font-size:.85rem;letter-spacing:.08em;color:var(--purple-deep);background:transparent;border:1.5px solid var(--purple-mid);padding:.45rem 1.2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:background .3s,color .3s,border-color .3s}
+.nav-cta:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep)}
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px;cursor:none}
+.nav-burger span{display:block;width:24px;height:1.5px;background:var(--ink);transition:all .3s}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;inset:0;z-index:199;background:rgba(250,250,248,.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:2.5rem}
+.mobile-nav.open{display:flex}
+.mobile-nav a{font-size:2rem;font-weight:200;color:var(--ink);text-decoration:none;transition:color .2s;cursor:none}
+.mobile-nav a:hover{color:var(--purple)}
+.close-btn{position:absolute;top:1.5rem;right:4rem;font-size:1.5rem;background:none;border:none;color:var(--ink);cursor:none}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 4rem;position:relative;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.blob1{width:520px;height:520px;background:var(--purple-light);opacity:.7;top:-100px;right:-80px;animation:bf1 9s ease-in-out infinite}
+.blob2{width:320px;height:320px;background:var(--cream);bottom:60px;left:10%;animation:bf2 12s ease-in-out infinite}
+@keyframes bf1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.08)}}
+@keyframes bf2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.05)}}
+.hero-content{position:relative;z-index:1;max-width:820px}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:300;letter-spacing:.12em;color:var(--purple);background:var(--purple-light);border:1px solid var(--purple-mid);padding:.3rem .9rem;border-radius:2rem;margin-bottom:2rem;opacity:0;transform:translateY(20px);animation:fu .8s .2s cubic-bezier(.23,1,.32,1) forwards}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-name{font-size:clamp(3rem,8vw,7rem);font-weight:200;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-bottom:.3rem;opacity:0;transform:translateY(30px);animation:fu .9s .35s cubic-bezier(.23,1,.32,1) forwards}
+.hero-name em{font-style:italic;color:var(--purple)}
+.hero-role{font-size:clamp(3rem,8vw,7rem);font-weight:500;line-height:1.05;letter-spacing:-.02em;color:var(--ink);opacity:0;transform:translateY(30px);animation:fu .9s .45s cubic-bezier(.23,1,.32,1) forwards}
+.hero-desc{margin-top:2rem;font-size:1rem;font-weight:300;line-height:1.8;color:var(--muted);max-width:500px;opacity:0;transform:translateY(20px);animation:fu .8s .6s cubic-bezier(.23,1,.32,1) forwards}
+.hero-actions{display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap;opacity:0;transform:translateY(20px);animation:fu .8s .75s cubic-bezier(.23,1,.32,1) forwards}
+.btn-primary{font-family:'Kanit',sans-serif;font-weight:400;font-size:.9rem;letter-spacing:.06em;background:var(--purple-deep);color:var(--white);border:none;padding:.8rem 2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:transform .25s,box-shadow .25s;display:inline-block}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(74,63,160,.35)}
+.btn-secondary{font-family:'Kanit',sans-serif;font-weight:300;font-size:.9rem;letter-spacing:.06em;background:transparent;color:var(--ink-mid);border:1.5px solid var(--cream-mid);padding:.8rem 2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:border-color .25s,color .25s;display:inline-block}
+.btn-secondary:hover{border-color:var(--purple-mid);color:var(--purple)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;font-size:.7rem;font-weight:300;letter-spacing:.15em;color:var(--muted);opacity:0;animation:fi 1s 1.2s forwards}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,transparent,var(--purple-mid));animation:sl 2s ease-in-out infinite}
+@keyframes sl{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(.5);opacity:.4}}
+.hero-stats{position:absolute;right:4rem;bottom:5rem;display:flex;flex-direction:column;gap:2rem;opacity:0;animation:fu .8s .9s cubic-bezier(.23,1,.32,1) forwards}
+.stat{text-align:right}
+.stat-num{font-size:2rem;font-weight:500;color:var(--purple-deep);line-height:1}
+.stat-label{font-size:.7rem;font-weight:300;letter-spacing:.1em;color:var(--muted);margin-top:.2rem}
+@keyframes fu{to{opacity:1;transform:translateY(0)}}
+@keyframes fi{to{opacity:1}}
+
+/* MARQUEE */
+.marquee-wrap{padding:2rem 0;background:var(--cream);border-top:1px solid var(--cream-mid);border-bottom:1px solid var(--cream-mid);overflow:hidden}
+.marquee-track{display:flex;gap:3rem;width:max-content;animation:mq 28s linear infinite}
+.marquee-wrap:hover .marquee-track{animation-play-state:paused}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-item{display:flex;align-items:center;gap:.75rem;font-size:.8rem;font-weight:300;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+.mq-item span{color:var(--purple)}
+
+/* SECTION COMMON */
+section{padding:7rem 4rem}
+.sec-label{display:flex;align-items:center;gap:1rem;font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem}
+.sec-label::before{content:'';display:block;width:30px;height:1px;background:var(--purple-mid)}
+.sec-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:200;line-height:1.1;color:var(--ink);letter-spacing:-.02em}
+.sec-title strong{font-weight:500}
+.sec-title em{font-style:italic;color:var(--purple)}
+
+/* WORK */
+#work{background:var(--white)}
+.work-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4rem;flex-wrap:wrap;gap:1rem}
+.work-filter{display:flex;gap:.5rem;flex-wrap:wrap}
+.filter-btn{font-family:'Kanit',sans-serif;font-weight:300;font-size:.8rem;letter-spacing:.06em;background:transparent;color:var(--muted);border:1px solid var(--cream-mid);padding:.35rem 1rem;border-radius:2rem;cursor:none;transition:all .25s}
+.filter-btn.active,.filter-btn:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep)}
+.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}
+.project-card{border-radius:1rem;overflow:hidden;border:1px solid var(--cream-mid);background:var(--white);transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s;cursor:none;text-decoration:none;color:inherit;display:block}
+.project-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(74,63,160,.12)}
+.project-card.featured{grid-column:span 2}
+.proj-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.proj-thumb-inner{position:absolute;inset:0;transition:transform .6s cubic-bezier(.23,1,.32,1)}
+.project-card:hover .proj-thumb-inner{transform:scale(1.07)}
+.t1{background:linear-gradient(135deg,#DDD8F5,#C9C0F0)}
+.t2{background:linear-gradient(135deg,#E8E3D8,#D5CCB8)}
+.t3{background:linear-gradient(135deg,#F0EDE4,#E0DACB)}
+.t4{background:linear-gradient(135deg,#E8E3F5,#D0C8EC)}
+.t5{background:linear-gradient(135deg,#F5F0FA,#E5D8F5)}
+.proj-emoji{position:relative;z-index:1;font-size:2.5rem;opacity:.7}
+.proj-info{padding:1.5rem}
+.proj-cat{font-size:.72rem;font-weight:300;letter-spacing:.14em;color:var(--purple);margin-bottom:.5rem}
+.proj-title-card{font-size:1.15rem;font-weight:400;color:var(--ink);margin-bottom:.5rem}
+.proj-desc-short{font-size:.85rem;font-weight:300;color:var(--muted);line-height:1.7}
+.proj-tags-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.proj-tag{font-size:.7rem;font-weight:300;letter-spacing:.05em;color:var(--muted);background:var(--cream);border-radius:1rem;padding:.2rem .7rem}
+.proj-cta-hint{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:400;color:var(--purple);margin-top:1rem;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s}
+.project-card:hover .proj-cta-hint{opacity:1;transform:translateX(0)}
+
+/* PROCESS */
+#process{background:var(--purple-deep)}
+#process .sec-label{color:var(--purple-mid)}
+#process .sec-label::before{background:var(--purple-mid)}
+#process .sec-title{color:var(--white)}
+#process .sec-title em{color:var(--purple-mid)}
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:4rem}
+.process-step{padding:2rem 1.5rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:1rem;transition:background .3s,transform .3s}
+.process-step:hover{background:rgba(255,255,255,.1);transform:translateY(-4px)}
+.step-num{font-size:3rem;font-weight:200;color:var(--purple-mid);line-height:1;margin-bottom:1.2rem;opacity:.5}
+.step-title{font-size:1.1rem;font-weight:400;color:var(--white);margin-bottom:.8rem}
+.step-desc{font-size:.85rem;font-weight:300;color:rgba(255,255,255,.5);line-height:1.7}
+
+/* CONTACT */
+#contact{background:var(--cream)}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center;padding-top:2rem}
+.contact-inner .sec-label{justify-content:center}
+.contact-inner .sec-label::before{display:none}
+.contact-title{font-size:clamp(2.5rem,6vw,5rem);font-weight:200;line-height:1.1;margin-bottom:1.5rem;letter-spacing:-.02em}
+.contact-title em{font-style:italic;color:var(--purple)}
+.contact-desc{font-size:1rem;font-weight:300;color:var(--muted);line-height:1.8;margin-bottom:3rem}
+.contact-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.contact-link{font-family:'Kanit',sans-serif;font-weight:300;font-size:.85rem;letter-spacing:.08em;text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:2rem;border:1.5px solid var(--purple-mid);color:var(--purple-deep);transition:all .3s;cursor:none}
+.contact-link:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep);transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:var(--ink);color:rgba(255,255,255,.4);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.78rem;font-weight:300;letter-spacing:.06em}
+footer span{color:var(--purple-mid)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.23,1,.32,1),transform .9s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}.rd4{transition-delay:.4s}
+
+/* ── ABOUT PAGE ─────────────────────────────── */
+#page-about{background:var(--white)}
+.about-page-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;padding:9rem 4rem 6rem}
+.exp-list{background:var(--cream);border-radius:1.5rem;padding:2.5rem}
+.exp-list-label{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:.8rem}
+.exp-list-label::before{content:'';display:block;width:24px;height:1px;background:var(--purple-mid)}
+.exp-item{display:grid;grid-template-columns:130px 1fr;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--cream-mid)}
+.exp-item:last-child{border-bottom:none}
+.exp-year{font-size:.78rem;font-weight:300;letter-spacing:.1em;color:var(--muted);padding-top:.15rem}
+.exp-role{font-size:1rem;font-weight:400;color:var(--ink);margin-bottom:.2rem}
+.exp-company{font-size:.85rem;font-weight:300;color:var(--purple)}
+.exp-desc{font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;margin-top:.5rem}
+.chip{font-size:.78rem;font-weight:300;letter-spacing:.06em;color:var(--purple-deep);background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:2rem;padding:.3rem .9rem;transition:background .2s,color .2s;cursor:default}
+.chip:hover{background:var(--purple-deep);color:var(--white)}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+
+/* ── PROJECT DETAIL PAGE ─────────────────────── */
+#page-project{background:var(--white)}
+.proj-detail-wrap{padding-top:7rem}
+.back-link{display:inline-flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:300;letter-spacing:.08em;color:var(--muted);cursor:none;padding:2rem 4rem 0;transition:color .2s}
+.back-link:hover{color:var(--purple)}
+.proj-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;padding:3rem 4rem 4rem}
+.proj-cat-tag{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--purple);margin-bottom:1rem}
+.proj-big-title{font-size:clamp(2rem,5vw,3.8rem);font-weight:200;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.5rem}
+.proj-big-title em{font-style:italic;color:var(--purple)}
+.proj-summary-text{font-size:1rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:2rem}
+.proj-meta-row{display:flex;gap:2rem;flex-wrap:wrap}
+.proj-meta-item .meta-label{font-size:.7rem;font-weight:300;letter-spacing:.14em;color:var(--muted);margin-bottom:.3rem}
+.proj-meta-item .meta-val{font-size:.9rem;font-weight:400;color:var(--ink)}
+.proj-cover-box{border-radius:1.2rem;overflow:hidden;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:5rem}
+.proj-sections{padding:0 4rem 5rem}
+.proj-section{margin-bottom:3.5rem}
+.proj-sec-title{font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream-mid)}
+.proj-sec-body{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted)}
+.outcomes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.5rem}
+.outcome-card{background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:.8rem;padding:1.3rem}
+.outcome-num{font-size:2rem;font-weight:500;color:var(--purple-deep);line-height:1}
+.outcome-label{font-size:.78rem;font-weight:300;color:var(--muted);margin-top:.4rem;letter-spacing:.06em}
+.proj-img-mock{border-radius:1rem;background:linear-gradient(135deg,var(--purple-light),var(--cream-mid));aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:1.5rem 0;opacity:.55}
+.proj-pagination{display:flex;justify-content:space-between;align-items:center;padding:2rem 4rem;border-top:1px solid var(--cream-mid);flex-wrap:wrap;gap:1rem}
+.page-link{font-family:'Kanit',sans-serif;font-weight:300;font-size:.85rem;letter-spacing:.08em;color:var(--purple-deep);cursor:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
+.page-link:hover{color:var(--purple)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav,nav.scrolled{padding:1.2rem 2rem}
+  #hero{padding:0 2rem}
+  .hero-stats{right:2rem}
+  section{padding:5rem 2rem}
+  .process-grid{grid-template-columns:repeat(2,1fr)}
+  footer{padding:2rem}
+  .proj-hero-grid{grid-template-columns:1fr;gap:2rem;padding:2rem}
+  .back-link{padding:2rem 2rem 0}
+  .proj-sections{padding:0 2rem 4rem}
+  .proj-pagination{padding:1.5rem 2rem}
+  .outcomes-grid{grid-template-columns:repeat(2,1fr)}
+  .about-page-wrap{grid-template-columns:1fr;padding:7rem 2rem 4rem}
+}
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .nav-burger{display:flex}
+  .hero-stats{display:none}
+  .projects-grid{grid-template-columns:1fr}
+  .project-card.featured{grid-column:span 1}
+  .process-grid{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr;gap:.4rem}
+  .outcomes-grid{grid-template-columns:1fr}
+  body{cursor:auto}
+  .cursor-dot,.cursor-ring{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="close-btn" onclick="closeMobile()">✕</button>
+  <a onclick="goTo('home');closeMobile()">Home</a>
+  <a onclick="goTo('about');closeMobile()">About</a>
+  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('work'))">Work</a>
+  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('process'))">Process</a>
+  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('contact'))">Contact</a>
+</div>
+
+<!-- Nav -->
+<nav id="mainNav">
+  <a class="nav-logo" onclick="goTo('home')">KP <span>·</span> Portfolio</a>
+  <ul class="nav-links">
+    <li><a onclick="goTo('about')">About</a></li>
+    <li><a onclick="goTo('home');raf(()=>scrollTo('work'))">Work</a></li>
+    <li><a onclick="goTo('home');raf(()=>scrollTo('process'))">Process</a></li>
+    <li><a onclick="goTo('home');raf(()=>scrollTo('contact'))">Contact</a></li>
+  </ul>
+  <a href="mailto:kanokwan.premj@gmail.com" class="nav-cta">Hire me</a>
+  <button class="nav-burger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ═══════════════════ HOME ═══════════════════ -->
+<div id="page-home" class="page active">
+
+  <section id="hero">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="hero-content">
+      <div class="hero-tag">UX/UI Designer · Bangkok, TH</div>
+      <h1 class="hero-name"><em>Kanokwan</em> Premjit</h1>
+      <h2 class="hero-role">UX/UI Designer</h2>
+      <p class="hero-desc">Crafting meaningful digital experiences through deep user empathy and meticulous attention to every pixel.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" onclick="scrollTo('work')">View Work →</a>
+        <a class="btn-secondary" onclick="goTo('about')">About Me</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">PROJECTS</div></div>
+      <div class="stat"><div class="stat-num">3+</div><div class="stat-label">YEARS EXP</div></div>
+      <div class="stat"><div class="stat-num">5+</div><div class="stat-label">COMPANIES</div></div>
+    </div>
+    <div class="hero-scroll">SCROLL <div class="scroll-line"></div></div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
+      <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> UI Animation</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe XD</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> Information Architecture</div>
+      <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
+      <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> UI Animation</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe XD</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> Information Architecture</div>
+    </div>
+  </div>
+
+  <section id="work">
+    <div class="work-header">
+      <div>
+        <div class="sec-label reveal">SELECTED WORK</div>
+        <div class="sec-title reveal" style="margin-top:.5rem">Featured <em>Projects</em></div>
+      </div>
+      <div class="work-filter reveal">
+        <button class="filter-btn active" onclick="filterProj('all',this)">All</button>
+        <button class="filter-btn" onclick="filterProj('mobile',this)">Mobile App</button>
+        <button class="filter-btn" onclick="filterProj('web',this)">Web</button>
+        <button class="filter-btn" onclick="filterProj('brand',this)">Branding</button>
+      </div>
+    </div>
+    <div class="projects-grid" id="projGrid">
+
+      <a class="project-card featured reveal" data-cat="web" onclick="openProj('automotive')">
+        <div class="proj-thumb t1"><div class="proj-thumb-inner t1"></div><div class="proj-emoji">🚗</div></div>
+        <div class="proj-info"><div class="proj-cat">WEB APPLICATION</div><div class="proj-title-card">Automotive Insurance Platform</div>
+        <div class="proj-desc-short">A comprehensive insurance platform redesigned to reduce complexity in the purchase journey and improve conversion rates.</div>
+        <div class="proj-tags-row"><span class="proj-tag">UX Research</span><span class="proj-tag">UI Design</span><span class="proj-tag">Prototype</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="web" onclick="openProj('bangkachao')">
+        <div class="proj-thumb t2"><div class="proj-thumb-inner t2"></div><div class="proj-emoji">🌿</div></div>
+        <div class="proj-info"><div class="proj-cat">DASHBOARD</div><div class="proj-title-card">DMS Platform Bang Kachao</div>
+        <div class="proj-desc-short">Environmental data management dashboard visualising biodiversity and usage metrics for Bangkok's green lung.</div>
+        <div class="proj-tags-row"><span class="proj-tag">Dashboard</span><span class="proj-tag">Data Viz</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="web" onclick="openProj('arttherapy')">
+        <div class="proj-thumb t3"><div class="proj-thumb-inner t3"></div><div class="proj-emoji">🎨</div></div>
+        <div class="proj-info"><div class="proj-cat">INTERACTIVE WEB</div><div class="proj-title-card">Art Therapy Interactive Website</div>
+        <div class="proj-desc-short">An immersive website for art therapy, promoting mental health through creative digital activities.</div>
+        <div class="proj-tags-row"><span class="proj-tag">Interaction Design</span><span class="proj-tag">Animation</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="mobile" onclick="openProj('gaabgaab')">
+        <div class="proj-thumb t4"><div class="proj-thumb-inner t4"></div><div class="proj-emoji">🐸</div></div>
+        <div class="proj-info"><div class="proj-cat">MOBILE APP</div><div class="proj-title-card">Gaab Gaab App</div>
+        <div class="proj-desc-short">A delightful mobile app with meticulous UI/UX that keeps users engaged and on-task.</div>
+        <div class="proj-tags-row"><span class="proj-tag">iOS Design</span><span class="proj-tag">User Flow</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="web" onclick="openProj('wibwab')">
+        <div class="proj-thumb t5"><div class="proj-thumb-inner t5"></div><div class="proj-emoji">💍</div></div>
+        <div class="proj-info"><div class="proj-cat">E-COMMERCE</div><div class="proj-title-card">Wibwab Accessories Web</div>
+        <div class="proj-desc-short">An editorial-aesthetic e-commerce site for accessories, designed for high conversion and brand storytelling.</div>
+        <div class="proj-tags-row"><span class="proj-tag">E-commerce UX</span><span class="proj-tag">Visual Design</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal" data-cat="mobile" onclick="openProj('robinhood')">
+        <div class="proj-thumb t1"><div class="proj-thumb-inner t1"></div><div class="proj-emoji">🍜</div></div>
+        <div class="proj-info"><div class="proj-cat">MOBILE APP · REDESIGN</div><div class="proj-title-card">Redesign Robinhood</div>
+        <div class="proj-desc-short">UX/UI audit and redesign of the Robinhood food delivery app, improving discoverability and checkout flow.</div>
+        <div class="proj-tags-row"><span class="proj-tag">UX Audit</span><span class="proj-tag">Redesign</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="mobile" onclick="openProj('wash2go')">
+        <div class="proj-thumb t2"><div class="proj-thumb-inner t2"></div><div class="proj-emoji">🫧</div></div>
+        <div class="proj-info"><div class="proj-cat">MOBILE APP</div><div class="proj-title-card">Wash2Go</div>
+        <div class="proj-desc-short">On-demand laundry service app designed for speed and ease — from booking to tracking, frictionless.</div>
+        <div class="proj-tags-row"><span class="proj-tag">Service Design</span><span class="proj-tag">Mobile UX</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="brand" onclick="openProj('ohotokyo')">
+        <div class="proj-thumb t3"><div class="proj-thumb-inner t3"></div><div class="proj-emoji">✈️</div></div>
+        <div class="proj-info"><div class="proj-cat">BRANDING</div><div class="proj-title-card">Oho! Tokyo Branding</div>
+        <div class="proj-desc-short">Brand identity for a Tokyo travel business — playful, vibrant, and deeply memorable.</div>
+        <div class="proj-tags-row"><span class="proj-tag">Brand Identity</span><span class="proj-tag">Graphic Design</span></div>
+        <div class="proj-cta-hint">View Case Study →</div></div>
+      </a>
+
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="sec-label reveal">HOW I WORK</div>
+    <div class="sec-title reveal" style="margin-top:.5rem;color:var(--white)">A Process Built on<br><em>Care</em> &amp; <strong>Curiosity</strong></div>
+    <div class="process-grid">
+      <div class="process-step reveal"><div class="step-num">01</div><div class="step-title">Research &amp; Discover</div><div class="step-desc">Understand users, problems, and business context through interviews, surveys, and competitive analysis.</div></div>
+      <div class="process-step reveal rd1"><div class="step-num">02</div><div class="step-title">Define &amp; Ideate</div><div class="step-desc">Shape problem statements, build user journeys, and ideate solutions with structured creative thinking.</div></div>
+      <div class="process-step reveal rd2"><div class="step-num">03</div><div class="step-title">Design &amp; Prototype</div><div class="step-desc">Create wireframes, high-fidelity visuals, and interactive prototypes that communicate the real experience.</div></div>
+      <div class="process-step reveal rd3"><div class="step-num">04</div><div class="step-title">Test &amp; Iterate</div><div class="step-desc">Test with real users, analyse findings, and iterate — repeating until the experience feels just right.</div></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="sec-label reveal">GET IN TOUCH</div>
+      <h2 class="contact-title reveal">Let's Build Something <em>Great</em> Together</h2>
+      <p class="contact-desc reveal">Interested in collaborating, have an exciting project, or just want to chat about design? I'd love to hear from you. ✦</p>
+      <div class="contact-links reveal">
+        <a href="mailto:kanokwan.premj@gmail.com" class="contact-link">📧 Email</a>
+        <a href="https://linkedin.com/in/kanokwan-premjit" class="contact-link" target="_blank">💼 LinkedIn</a>
+        <a href="https://behance.net/kanokwanpremjit" class="contact-link" target="_blank">🎨 Behance</a>
+      </div>
+    </div>
+  </section>
+
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<div id="page-about" class="page">
+  <div class="about-page-wrap">
+    <div>
+      <div class="sec-label">ABOUT ME</div>
+      <div class="sec-title" style="margin-bottom:1.5rem">Designing with <em>Intention</em>,<br>Every Single Time</div>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from KMUTT with a First Class Honours degree in Applied Computer Science (Multimedia).</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">With experience across startups and tech companies, I specialise in designing UX/UI that balances aesthetics with real-world usability. Currently at Tech Invent Co., Ltd., I bring a detail-oriented, user-centred approach to every project.</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted)">When I'm not designing, you'll find me exploring editorial design trends and refining my personal visual language.</p>
+      <div class="chips-wrap">
+        <span class="chip">Figma</span><span class="chip">Prototyping</span><span class="chip">User Research</span>
+        <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe XD</span>
+        <span class="chip">Usability Testing</span><span class="chip">HTML/CSS</span><span class="chip">Motion Design</span>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2.5rem">
+        <a href="mailto:kanokwan.premj@gmail.com" class="btn-primary">Say Hello →</a>
+        <a class="btn-secondary" onclick="goTo('home')">← Back to Home</a>
+      </div>
+    </div>
+    <div class="exp-list">
+      <div class="exp-list-label">EXPERIENCE</div>
+      <div class="exp-item"><div class="exp-year">2024 – Now</div><div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div></div>
+      <div class="exp-item"><div class="exp-year">2023</div><div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Botnoi Group</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products.</div></div></div>
+      <div class="exp-item"><div class="exp-year">2022</div><div><div class="exp-role">UI Designer</div><div class="exp-company">LearnDo</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div></div>
+      <div class="exp-item"><div class="exp-year">2021</div><div><div class="exp-role">President of Design</div><div class="exp-company">KMUTT Student Union</div><div class="exp-desc">Led visual communication and event branding for the university student body.</div></div></div>
+      <div class="exp-item"><div class="exp-year">2020</div><div><div class="exp-role">Graphic Designer</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral, print materials, and product visual design.</div></div></div>
+    </div>
+  </div>
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<!-- ═══════════════════ PROJECT DETAIL ═══════════════════ -->
+<div id="page-project" class="page">
+  <div class="proj-detail-wrap">
+    <div class="back-link" onclick="goTo('home');raf(()=>scrollTo('work'))">← Back to Work</div>
+    <div class="proj-hero-grid" id="pdHero"></div>
+    <div class="proj-sections" id="pdBody"></div>
+    <div class="proj-pagination" id="pdNav"></div>
+  </div>
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<script>
+/* ── DATA ─────────────────────────────────────── */
+const PD={
+  automotive:{id:'automotive',emoji:'🚗',tc:'t1',cat:'WEB APPLICATION',title:'Automotive Insurance Platform',
+    summary:'A full redesign of an automotive insurance web platform focused on reducing cognitive load and improving purchase completion for first-time buyers.',
+    role:'Lead UX/UI Designer',duration:'3 Months',tools:'Figma, Maze, Miro',
+    challenge:'The original platform had a 68% drop-off rate during policy selection. Users were overwhelmed by jargon and unclear pricing structures.',
+    process:'Conducted 12 user interviews and 3 rounds of card sorting. Built an affinity map to cluster pain points, then ran 5 design sprints to simplify coverage selection. High-fidelity prototypes were tested with 20 participants via remote usability sessions.',
+    outcome:'The redesigned flow reduced average time-on-task from 8 minutes to 3.5 minutes, and the prototype showed a 42% improvement in task completion.',
+    outcomes:[{n:'42%',l:'Task Completion Lift'},{n:'3.5 min',l:'Avg. Time on Task'},{n:'87%',l:'Satisfaction Score'}],
+    tags:['UX Research','UI Design','Prototype','Usability Testing'],prev:'ohotokyo',next:'bangkachao'},
+  bangkachao:{id:'bangkachao',emoji:'🌿',tc:'t2',cat:'DASHBOARD',title:'DMS Platform Bang Kachao',
+    summary:"An environmental data management dashboard for Bang Kachao — Bangkok's green lung — helping rangers visualise biodiversity, visitor flow, and conservation progress.",
+    role:'UX/UI Designer',duration:'4 Months',tools:'Figma, Adobe Illustrator',
+    challenge:'Stakeholders needed a single view of fragmented datasets. Existing tools were spreadsheet-based and inaccessible to non-technical rangers.',
+    process:'Ran discovery workshops with park rangers, conservation researchers, and the Bangkok Metropolitan Administration. Created information architecture maps and ran three rounds of co-design sessions.',
+    outcome:'The dashboard is now in active use, consolidating 5 previously separate data sources into one accessible interface.',
+    outcomes:[{n:'5',l:'Data Sources Unified'},{n:'3×',l:'Faster Reporting'},{n:'100%',l:'Stakeholder Adoption'}],
+    tags:['Dashboard','Data Visualisation','Stakeholder Research'],prev:'automotive',next:'arttherapy'},
+  arttherapy:{id:'arttherapy',emoji:'🎨',tc:'t3',cat:'INTERACTIVE WEB',title:'Art Therapy Interactive Website',
+    summary:'An immersive browser-based experience guiding users through creative art therapy exercises to support emotional wellbeing — no downloads, no account needed.',
+    role:'UX/UI & Interaction Designer',duration:'2 Months',tools:'Figma, HTML/CSS/JS',
+    challenge:'Mental health resources online are often clinical and intimidating. The brief called for something warm, playful, and instantly accessible — particularly for teenagers.',
+    process:'Developed user personas based on mental health research. Designed a non-linear interaction model where users choose their emotional starting point. Prototyped and tested with 15 participants aged 16–24.',
+    outcome:'92% of test users completed at least one full therapy module without prompting, rating the experience 4.8/5 for emotional safety.',
+    outcomes:[{n:'92%',l:'Module Completion'},{n:'4.8/5',l:'Emotional Safety Score'},{n:'15',l:'Test Participants'}],
+    tags:['Interaction Design','Motion Design','HTML/CSS','Mental Health UX'],prev:'bangkachao',next:'gaabgaab'},
+  gaabgaab:{id:'gaabgaab',emoji:'🐸',tc:'t4',cat:'MOBILE APP',title:'Gaab Gaab App',
+    summary:'A mobile app with personality — Gaab Gaab uses playful visuals and a carefully crafted information hierarchy to help users stay organised and engaged.',
+    role:'UI/UX Designer',duration:'6 Weeks',tools:'Figma, Principle',
+    challenge:'Productivity apps often feel sterile. The challenge was to create a task management experience that felt genuinely fun without sacrificing clarity.',
+    process:'Ran competitive analysis across 8 apps. Defined a character-driven design language and component library. Tested 3 navigation models with target users aged 18–28.',
+    outcome:'Prototype testing showed a 34% higher daily return rate compared to a baseline app in A/B sessions.',
+    outcomes:[{n:'34%',l:'Higher Return Rate'},{n:'8',l:'Apps Analysed'},{n:'4.6/5',l:'Usability Score'}],
+    tags:['iOS Design','User Flow','Motion','Character Design'],prev:'arttherapy',next:'wibwab'},
+  wibwab:{id:'wibwab',emoji:'💍',tc:'t5',cat:'E-COMMERCE',title:'Wibwab Accessories Web',
+    summary:'An editorial-first e-commerce website for an accessories brand, designed to tell the brand story while driving product discovery and conversion.',
+    role:'UX/UI Designer',duration:'8 Weeks',tools:'Figma, Shopify',
+    challenge:"The brand's Instagram aesthetic wasn't translating to their existing store. Bounce rate was high and average order value was low.",
+    process:'Analysed heatmaps and conducted 10 customer interviews. Rebuilt the product page hierarchy with editorial photography at its core. Introduced curated "look" bundles to increase basket size.',
+    outcome:'The redesigned store achieved a 28% increase in average session duration and a 19% lift in average order value within the first month.',
+    outcomes:[{n:'+28%',l:'Session Duration'},{n:'+19%',l:'Avg. Order Value'},{n:'↓41%',l:'Bounce Rate Drop'}],
+    tags:['E-commerce UX','Visual Design','Shopify','Conversion Optimisation'],prev:'gaabgaab',next:'robinhood'},
+  robinhood:{id:'robinhood',emoji:'🍜',tc:'t1',cat:'MOBILE APP · REDESIGN',title:'Redesign Robinhood',
+    summary:"A UX audit and concept redesign of Robinhood Thailand's food delivery app, addressing discoverability gaps and streamlining checkout.",
+    role:'UX Researcher & UI Designer',duration:'4 Weeks',tools:'Figma, Maze',
+    challenge:'The existing app suffered from poor restaurant discoverability and a multi-step checkout causing abandonment. Heuristic evaluation revealed 11 usability violations.',
+    process:"Completed a full heuristic evaluation using Nielsen's 10 principles. Mapped the as-is journey and identified 6 critical friction points. Redesigned search, restaurant pages, and checkout.",
+    outcome:'10 out of 12 Robinhood users preferred the redesigned checkout flow. Task completion improved from 71% to 94%.',
+    outcomes:[{n:'94%',l:'Task Completion'},{n:'11',l:'Issues Resolved'},{n:'10/12',l:'Users Preferred Redesign'}],
+    tags:['UX Audit','Heuristic Evaluation','Redesign','Mobile UX'],prev:'wibwab',next:'wash2go'},
+  wash2go:{id:'wash2go',emoji:'🫧',tc:'t2',cat:'MOBILE APP',title:'Wash2Go',
+    summary:'An on-demand laundry service app for busy urban users — fast booking, real-time tracking, and an interface that makes a mundane task feel effortless.',
+    role:'UX/UI Designer',duration:'5 Weeks',tools:'Figma, ProtoPie',
+    challenge:'Users of existing laundry apps reported confusion around pricing, pickup times, and order status. The goal was radical simplicity.',
+    process:'Shadowed 6 users through weekly laundry routines. Built 4 competing prototypes and ran rapid preference tests. Settled on single-screen booking with inline pricing transparency.',
+    outcome:'Single-screen booking reduced average booking time to under 60 seconds. Test users rated ease-of-use at 4.9/5.',
+    outcomes:[{n:'<60s',l:'Booking Time'},{n:'4.9/5',l:'Ease of Use'},{n:'6',l:'Research Sessions'}],
+    tags:['Service Design','Mobile UX','ProtoPie','Contextual Research'],prev:'robinhood',next:'ohotokyo'},
+  ohotokyo:{id:'ohotokyo',emoji:'✈️',tc:'t3',cat:'BRANDING',title:'Oho! Tokyo Branding',
+    summary:'A complete brand identity for a Tokyo travel experience business — vibrant, characterful, and designed to stop the scroll on social media.',
+    role:'Brand & Graphic Designer',duration:'3 Weeks',tools:'Figma, Adobe Illustrator',
+    challenge:'The client wanted to stand out in a saturated travel market targeting Thai millennials seeking curated, Instagram-worthy Japan experiences.',
+    process:'Ran brand workshops to define tone of voice and visual pillars. Explored 3 concept directions. Developed the chosen direction across logo, colour system, typography, social templates, and print collateral.',
+    outcome:'The brand launched across Instagram and LINE gaining 2,000 followers in two weeks. The client reported a 3× increase in inquiry messages post-rebrand.',
+    outcomes:[{n:'2K',l:'Followers in 2 Weeks'},{n:'3×',l:'Inquiry Volume'},{n:'3',l:'Concepts Explored'}],
+    tags:['Brand Identity','Logo Design','Graphic Design','Social Media'],prev:'wash2go',next:'automotive'}
+};
+
+/* ── ROUTING ──────────────────────────────────── */
+function goTo(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  setTimeout(initReveal,80);
+}
+function raf(fn){requestAnimationFrame(fn)}
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+}
+function closeMobile(){document.getElementById('mobileNav').classList.remove('open')}
+
+/* ── OPEN PROJECT ─────────────────────────────── */
+function openProj(id){
+  const p=PD[id]; if(!p)return;
+  document.getElementById('pdHero').innerHTML=`
+    <div>
+      <div class="proj-cat-tag">${p.cat}</div>
+      <h1 class="proj-big-title">${p.title}</h1>
+      <p class="proj-summary-text">${p.summary}</p>
+      <div class="proj-meta-row">
+        <div class="proj-meta-item"><div class="meta-label">ROLE</div><div class="meta-val">${p.role}</div></div>
+        <div class="proj-meta-item"><div class="meta-label">DURATION</div><div class="meta-val">${p.duration}</div></div>
+        <div class="proj-meta-item"><div class="meta-label">TOOLS</div><div class="meta-val">${p.tools}</div></div>
+      </div>
+    </div>
+    <div class="proj-cover-box ${p.tc}">${p.emoji}</div>`;
+
+  document.getElementById('pdBody').innerHTML=`
+    <div class="proj-section"><div class="proj-sec-title">The Challenge</div><p class="proj-sec-body">${p.challenge}</p></div>
+    <div class="proj-section"><div class="proj-sec-title">Process</div><p class="proj-sec-body">${p.process}</p><div class="proj-img-mock">${p.emoji}</div></div>
+    <div class="proj-section"><div class="proj-sec-title">Outcome</div><p class="proj-sec-body">${p.outcome}</p>
+      <div class="outcomes-grid">${p.outcomes.map(o=>`<div class="outcome-card"><div class="outcome-num">${o.n}</div><div class="outcome-label">${o.l}</div></div>`).join('')}</div>
+    </div>
+    <div class="proj-section"><div class="proj-sec-title">Skills &amp; Tools</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem">${p.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+    </div>`;
+
+  const pv=PD[p.prev],nx=PD[p.next];
+  document.getElementById('pdNav').innerHTML=`
+    <span class="page-link" onclick="openProj('${pv.id}')">← ${pv.title}</span>
+    <a class="btn-primary" onclick="goTo('home');raf(()=>scrollTo('work'))">All Projects</a>
+    <span class="page-link" onclick="openProj('${nx.id}')">${nx.title} →</span>`;
+
+  goTo('project');
+}
+
+/* ── CURSOR ───────────────────────────────────── */
+const cDot=document.getElementById('cDot'),cRing=document.getElementById('cRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function loop(){
+  cDot.style.cssText+=`;left:${mx}px;top:${my}px`;
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  cRing.style.cssText+=`;left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(loop);
+})();
+document.addEventListener('mouseover',e=>{
+  const t=e.target.closest('a,button,.project-card,.chip,.filter-btn,.process-step,.contact-link,.page-link,.proj-cta-hint');
+  document.body.classList.toggle('chover',!!t);
+});
+
+/* ── NAV SCROLL ───────────────────────────────── */
+const nav=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>60),{passive:true});
+
+/* ── SCROLL REVEAL ────────────────────────────── */
+function initReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+  },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el=>obs.observe(el));
+}
+initReveal();
+
+/* ── PROJECT FILTER ───────────────────────────── */
+function filterProj(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.project-card').forEach(c=>{
+    const show=cat==='all'||c.dataset.cat===cat;
+    c.style.opacity=show?'1':'0.18';
+    c.style.transform=show?'':'scale(.97)';
+    c.style.pointerEvents=show?'':'none';
+  });
+  const f=document.querySelector('.project-card.featured');
+  if(f)f.style.gridColumn=(cat==='all'||cat==='web')?'span 2':'span 1';
+}
+</script>
+</body>
+</html>
