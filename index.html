@@ -5,11 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kanokwan Premjit — UX/UI Designer</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" hef="img/logo.png">
 <style>
 :root{--white:#FAFAF8;--cream:#F0EDE4;--cream-mid:#E8E3D8;--purple-light:#EAE6FA;--purple-mid:#C9C0F0;--purple:#7B6FCD;--purple-deep:#4A3FA0;--ink:#1A1830;--ink-mid:#3D3960;--muted:#8C88A8;--border:rgba(123,111,205,.15)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Kanit',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;cursor:none}
+
+/* ── PASSWORD MODAL ───────────────────────── */
+.pw-modal{position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:all .3s ease}
+.pw-modal.show{opacity:1;pointer-events:auto}
+.pw-box{width:340px;background:rgba(255,255,255,.75);backdrop-filter:blur(20px);border:1px solid rgba(123,111,205,.2);border-radius:1.2rem;padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-hint{font-size:0.72rem;font-weight:300;letter-spacing:.03em;color:var(--muted);margin-top:0.75rem;text-align:center;line-height:1.5}
+.pw-title{font-size:1.2rem;font-weight:500;color:var(--ink);margin-bottom:.5rem}
+.pw-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+#pwInput{width:100%;padding:.7rem 1rem;border-radius:.8rem;border:1px solid var(--cream-mid);font-family:'Kanit',sans-serif;outline:none;margin-bottom:.6rem}
+#pwInput:focus{border-color:var(--purple-mid)}
+.pw-error{font-size:.75rem;color:#e74c3c;margin-bottom:.8rem;display:none}
+.pw-btn{width:100%;padding:.7rem;border:none;border-radius:2rem;background:var(--purple-deep);color:white;font-family:'Kanit',sans-serif;cursor:pointer;transition:.25s}
+.pw-btn:hover{transform:translateY(-1px);box-shadow:0 10px 25px rgba(74,63,160,.3)}
+
+/* ── PROTECTED PROJECT ───────────────────────── */
+.project-card.protected .proj-thumb img{filter:blur(6px) brightness(.85);transform:scale(1.05)}
+.project-card.protected:hover .proj-thumb img{filter:blur(2px) brightness(.95)}
+.project-card.protected .proj-thumb::after{content:"Confidential Project 🔒 HR Access Only";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;letter-spacing:.1em;color:white;background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,.1));opacity:.85;transition:.3s}
+.project-card.protected:hover .proj-thumb::after{opacity:.6}
+.pw-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1rem;color:var(--muted);cursor:pointer}
+.pw-eye svg{display:block;position:absolute;inset:0;margin:auto;transition:opacity .2s ease, transform .2s ease}
+.eye-open{opacity:1}
+.eye-closed{opacity:0}
+.pw-eye.active .eye-open{opacity:0}
+.pw-eye.active .eye-closed{opacity:1}
+.pw-input-wrap{position:relative;display:flex;align-items:center}
+.pw-eye{position:absolute;right:30px;top:45%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+#pwInput{padding-right:2.2rem}
+.proj-lock{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border:1px solid rgba(123,111,205,.25);font-size:.75rem;padding:.25rem .5rem;border-radius:999px;box-shadow:0 5px 15px rgba(0,0,0,.1);z-index:2}
+.project-card.protected .proj-thumb::after{font-weight:300;text-transform:uppercase}
+.project-card.protected:hover{transform:translateY(-4px)}
 
 /* CURSOR */
 .cursor-dot{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;width:8px;height:8px;background:var(--purple);border-radius:50%;transform:translate(-50%,-50%);transition:transform .1s,background .2s}
@@ -44,7 +76,7 @@ nav.scrolled{background:rgba(250,250,248,.9);backdrop-filter:blur(16px);padding:
 .close-btn{position:absolute;top:1.5rem;right:4rem;font-size:1.5rem;background:none;border:none;color:var(--ink);cursor:none}
 
 /* HERO */
-#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 4rem;position:relative;overflow:hidden}
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 4rem;position:relative;overflow:hidden ;padding-top:100px;}
 .blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
 .blob1{width:520px;height:520px;background:var(--purple-light);opacity:.7;top:-100px;right:-80px;animation:bf1 9s ease-in-out infinite}
 .blob2{width:320px;height:320px;background:var(--cream);bottom:60px;left:10%;animation:bf2 12s ease-in-out infinite}
@@ -99,15 +131,15 @@ section{padding:7rem 4rem}
 .project-card{border-radius:1rem;overflow:hidden;border:1px solid var(--cream-mid);background:var(--white);transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s;cursor:none;text-decoration:none;color:inherit;display:block}
 .project-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(74,63,160,.12)}
 .project-card.featured{grid-column:span 2}
-.proj-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.proj-thumb-inner{position:absolute;inset:0;transition:transform .6s cubic-bezier(.23,1,.32,1)}
-.project-card:hover .proj-thumb-inner{transform:scale(1.07)}
+.proj-thumb{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:var(--cream)}
+.proj-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.23,1,.32,1)}
+.project-card:hover .proj-thumb img{transform:scale(1.07)}
 .t1{background:linear-gradient(135deg,#DDD8F5,#C9C0F0)}
 .t2{background:linear-gradient(135deg,#E8E3D8,#D5CCB8)}
 .t3{background:linear-gradient(135deg,#F0EDE4,#E0DACB)}
 .t4{background:linear-gradient(135deg,#E8E3F5,#D0C8EC)}
 .t5{background:linear-gradient(135deg,#F5F0FA,#E5D8F5)}
-.proj-emoji{position:relative;z-index:1;font-size:2.5rem;opacity:.7}
+.t6{background:linear-gradient(135deg,#E8F5F0,#C8E8DC)}
 .proj-info{padding:1.5rem}
 .proj-cat{font-size:.72rem;font-weight:300;letter-spacing:.14em;color:var(--purple);margin-bottom:.5rem}
 .proj-title-card{font-size:1.15rem;font-weight:400;color:var(--ink);margin-bottom:.5rem}
@@ -116,6 +148,31 @@ section{padding:7rem 4rem}
 .proj-tag{font-size:.7rem;font-weight:300;letter-spacing:.05em;color:var(--muted);background:var(--cream);border-radius:1rem;padding:.2rem .7rem}
 .proj-cta-hint{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:400;color:var(--purple);margin-top:1rem;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s}
 .project-card:hover .proj-cta-hint{opacity:1;transform:translateX(0)}
+
+/*Logo*/
+.logo-img{
+  height: 50px;
+  width: auto;
+  display: block;
+}
+/* ── ABOUT SECTION (HOMEPAGE) ─────────────────── */
+#about-home{background:var(--cream)}
+.about-home-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;margin-top:4rem}
+.about-home-text p{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+.chip{font-size:.78rem;font-weight:300;letter-spacing:.06em;color:var(--purple-deep);background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:2rem;padding:.3rem .9rem;transition:background .2s,color .2s;cursor:default}
+.chip:hover{background:var(--purple-deep);color:var(--white)}
+.about-home-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2.5rem}
+/* exp list */
+.exp-list{background:var(--white);border-radius:1.5rem;padding:2.5rem;box-shadow:0 4px 24px rgba(74,63,160,.06)}
+.exp-list-label{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:.8rem}
+.exp-list-label::before{content:'';display:block;width:24px;height:1px;background:var(--purple-mid)}
+.exp-item{display:grid;grid-template-columns:130px 1fr;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--cream-mid)}
+.exp-item:last-child{border-bottom:none}
+.exp-year{font-size:.78rem;font-weight:300;letter-spacing:.1em;color:var(--muted);padding-top:.15rem}
+.exp-role{font-size:1rem;font-weight:400;color:var(--ink);margin-bottom:.2rem}
+.exp-company{font-size:.85rem;font-weight:300;color:var(--purple)}
+.exp-desc{font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;margin-top:.5rem}
 
 /* PROCESS */
 #process{background:var(--purple-deep)}
@@ -131,7 +188,7 @@ section{padding:7rem 4rem}
 .step-desc{font-size:.85rem;font-weight:300;color:rgba(255,255,255,.5);line-height:1.7}
 
 /* CONTACT */
-#contact{background:var(--cream)}
+#contact{background:var(--white)}
 .contact-inner{max-width:700px;margin:0 auto;text-align:center;padding-top:2rem}
 .contact-inner .sec-label{justify-content:center}
 .contact-inner .sec-label::before{display:none}
@@ -151,21 +208,10 @@ footer span{color:var(--purple-mid)}
 .reveal.visible{opacity:1;transform:translateY(0)}
 .rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}.rd4{transition-delay:.4s}
 
-/* ── ABOUT PAGE ─────────────────────────────── */
+/* ── ABOUT PAGE (standalone) ─────────────────────────────── */
 #page-about{background:var(--white)}
 .about-page-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;padding:9rem 4rem 6rem}
-.exp-list{background:var(--cream);border-radius:1.5rem;padding:2.5rem}
-.exp-list-label{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:.8rem}
-.exp-list-label::before{content:'';display:block;width:24px;height:1px;background:var(--purple-mid)}
-.exp-item{display:grid;grid-template-columns:130px 1fr;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--cream-mid)}
-.exp-item:last-child{border-bottom:none}
-.exp-year{font-size:.78rem;font-weight:300;letter-spacing:.1em;color:var(--muted);padding-top:.15rem}
-.exp-role{font-size:1rem;font-weight:400;color:var(--ink);margin-bottom:.2rem}
-.exp-company{font-size:.85rem;font-weight:300;color:var(--purple)}
-.exp-desc{font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;margin-top:.5rem}
-.chip{font-size:.78rem;font-weight:300;letter-spacing:.06em;color:var(--purple-deep);background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:2rem;padding:.3rem .9rem;transition:background .2s,color .2s;cursor:default}
-.chip:hover{background:var(--purple-deep);color:var(--white)}
-.chips-wrap{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+.about-page-wrap .exp-list{background:var(--cream);box-shadow:none}
 
 /* ── PROJECT DETAIL PAGE ─────────────────────── */
 #page-project{background:var(--white)}
@@ -180,7 +226,8 @@ footer span{color:var(--purple-mid)}
 .proj-meta-row{display:flex;gap:2rem;flex-wrap:wrap}
 .proj-meta-item .meta-label{font-size:.7rem;font-weight:300;letter-spacing:.14em;color:var(--muted);margin-bottom:.3rem}
 .proj-meta-item .meta-val{font-size:.9rem;font-weight:400;color:var(--ink)}
-.proj-cover-box{border-radius:1.2rem;overflow:hidden;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:5rem}
+.proj-cover-box{border-radius:1.2rem;overflow:hidden;aspect-ratio:16/10}
+.proj-cover-box img{width:100%;height:100%;object-fit:cover;display:block}
 .proj-sections{padding:0 4rem 5rem}
 .proj-section{margin-bottom:3.5rem}
 .proj-sec-title{font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream-mid)}
@@ -189,7 +236,8 @@ footer span{color:var(--purple-mid)}
 .outcome-card{background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:.8rem;padding:1.3rem}
 .outcome-num{font-size:2rem;font-weight:500;color:var(--purple-deep);line-height:1}
 .outcome-label{font-size:.78rem;font-weight:300;color:var(--muted);margin-top:.4rem;letter-spacing:.06em}
-.proj-img-mock{border-radius:1rem;background:linear-gradient(135deg,var(--purple-light),var(--cream-mid));aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:1.5rem 0;opacity:.55}
+.proj-img-mock{border-radius:1rem;overflow:hidden;aspect-ratio:16/9;margin:1.5rem 0}
+.proj-img-mock img{width:100%;height:100%;object-fit:cover;display:block}
 .proj-pagination{display:flex;justify-content:space-between;align-items:center;padding:2rem 4rem;border-top:1px solid var(--cream-mid);flex-wrap:wrap;gap:1rem}
 .page-link{font-family:'Kanit',sans-serif;font-weight:300;font-size:.85rem;letter-spacing:.08em;color:var(--purple-deep);cursor:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
 .page-link:hover{color:var(--purple)}
@@ -208,6 +256,7 @@ footer span{color:var(--purple-mid)}
   .proj-pagination{padding:1.5rem 2rem}
   .outcomes-grid{grid-template-columns:repeat(2,1fr)}
   .about-page-wrap{grid-template-columns:1fr;padding:7rem 2rem 4rem}
+  .about-home-grid{grid-template-columns:1fr;gap:3rem}
 }
 @media(max-width:768px){
   .nav-links,.nav-cta{display:none}
@@ -218,6 +267,7 @@ footer span{color:var(--purple-mid)}
   .process-grid{grid-template-columns:1fr}
   .exp-item{grid-template-columns:1fr;gap:.4rem}
   .outcomes-grid{grid-template-columns:1fr}
+  .about-home-grid{grid-template-columns:1fr}
   body{cursor:auto}
   .cursor-dot,.cursor-ring{display:none}
 }
@@ -231,21 +281,22 @@ footer span{color:var(--purple-mid)}
 <!-- Mobile Nav -->
 <div class="mobile-nav" id="mobileNav">
   <button class="close-btn" onclick="closeMobile()">✕</button>
-  <a onclick="goTo('home');closeMobile()">Home</a>
-  <a onclick="goTo('about');closeMobile()">About</a>
-  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('work'))">Work</a>
-  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('process'))">Process</a>
-  <a onclick="goTo('home');closeMobile();raf(()=>scrollTo('contact'))">Contact</a>
+  <a onclick="navGoTo('home','work')">Work</a>
+    <a onclick="navGoTo('home','about-home')">About</a>
+  <a onclick="navGoTo('home','process')">Process</a>
+  <a onclick="navGoTo('home','contact')">Contact</a>
 </div>
 
 <!-- Nav -->
 <nav id="mainNav">
-  <a class="nav-logo" onclick="goTo('home')">KP <span>·</span> Portfolio</a>
-  <ul class="nav-links">
-    <li><a onclick="goTo('about')">About</a></li>
-    <li><a onclick="goTo('home');raf(()=>scrollTo('work'))">Work</a></li>
-    <li><a onclick="goTo('home');raf(()=>scrollTo('process'))">Process</a></li>
-    <li><a onclick="goTo('home');raf(()=>scrollTo('contact'))">Contact</a></li>
+<a class="nav-logo" onclick="goTo('home')">
+  <img src="img/logo.png" alt="logo" class="logo-img">
+  <span>Portfolio</span>
+</a>  <ul class="nav-links">
+        <li><a onclick="navGoTo('home','work')">Work</a></li>
+    <li><a onclick="navGoTo('home','about-home')">About</a></li>
+    <li><a onclick="navGoTo('home','process')">Process</a></li>
+    <li><a onclick="navGoTo('home','contact')">Contact</a></li>
   </ul>
   <a href="mailto:kanokwan.premj@gmail.com" class="nav-cta">Hire me</a>
   <button class="nav-burger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
@@ -265,14 +316,9 @@ footer span{color:var(--purple-mid)}
       <h2 class="hero-role">UX/UI Designer</h2>
       <p class="hero-desc">Crafting meaningful digital experiences through deep user empathy and meticulous attention to every pixel.</p>
       <div class="hero-actions">
-        <a class="btn-primary" onclick="scrollTo('work')">View Work →</a>
-        <a class="btn-secondary" onclick="goTo('about')">About Me</a>
+        <a class="btn-primary" onclick="scrollToSection('work')">View Work →</a>
+        <a class="btn-secondary" onclick="scrollToSection('about-home')">About Me</a>
       </div>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="stat-num">10+</div><div class="stat-label">PROJECTS</div></div>
-      <div class="stat"><div class="stat-num">3+</div><div class="stat-label">YEARS EXP</div></div>
-      <div class="stat"><div class="stat-num">5+</div><div class="stat-label">COMPANIES</div></div>
     </div>
     <div class="hero-scroll">SCROLL <div class="scroll-line"></div></div>
   </section>
@@ -281,14 +327,14 @@ footer span{color:var(--purple-mid)}
     <div class="marquee-track">
       <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
       <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
-      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> UI Animation</div>
-      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe XD</div>
-      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> Information Architecture</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> Motion Design</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe Illustrator</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> HTML / CSS / JS</div>
       <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
       <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
-      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> UI Animation</div>
-      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe XD</div>
-      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> Information Architecture</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> Motion Design</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe Illustrator</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> HTML / CSS / JS</div>
     </div>
   </div>
 
@@ -307,70 +353,197 @@ footer span{color:var(--purple-mid)}
     </div>
     <div class="projects-grid" id="projGrid">
 
-      <a class="project-card featured reveal" data-cat="web" onclick="openProj('automotive')">
-        <div class="proj-thumb t1"><div class="proj-thumb-inner t1"></div><div class="proj-emoji">🚗</div></div>
-        <div class="proj-info"><div class="proj-cat">WEB APPLICATION</div><div class="proj-title-card">Automotive Insurance Platform</div>
-        <div class="proj-desc-short">A comprehensive insurance platform redesigned to reduce complexity in the purchase journey and improve conversion rates.</div>
-        <div class="proj-tags-row"><span class="proj-tag">UX Research</span><span class="proj-tag">UI Design</span><span class="proj-tag">Prototype</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+      <!-- 1. Automotive Insurance -->
+      <a class="project-card reveal" data-cat="web" onclick="openProj('automotive')">
+        <div class="proj-thumb t1">
+          <img src="img/automotive.jpg" alt="Automotive Insurance Platform" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-lock">🔒</div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB APPLICATION · PROFESSIONAL PROJECT</div>
+          <div class="proj-title-card">Automotive Insurance Platform</div>
+          <div class="proj-desc-short">A web-based insurance platform for internal staff and dealers, replacing a 10-year-old legacy Windows system with intuitive, task-oriented workflows.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX Research</span><span class="proj-tag">UI Design</span><span class="proj-tag">Workflow Redesign</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 10. E-learning Platform -->
+      <a class="project-card reveal rd1" data-cat="web" onclick="openProj('elearning')">
+        <div class="proj-thumb t10">
+          <img src="portfolio/img/elearning.jpg" alt="E-learning Platform" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-lock">🔒</div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB PLATFORM · PROFESSIONAL PROJECT</div>
+          <div class="proj-title-card">E-learning Platform</div>
+          <div class="proj-desc-short">An online learning platform designed to improve accessibility and engagement through structured courses, video learning, quizzes, and progress tracking.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX/UI Design</span><span class="proj-tag">Dashboard</span><span class="proj-tag">E-learning</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <!-- 2. DMS Platform Bang Kachao -->
       <a class="project-card reveal rd1" data-cat="web" onclick="openProj('bangkachao')">
-        <div class="proj-thumb t2"><div class="proj-thumb-inner t2"></div><div class="proj-emoji">🌿</div></div>
-        <div class="proj-info"><div class="proj-cat">DASHBOARD</div><div class="proj-title-card">DMS Platform Bang Kachao</div>
-        <div class="proj-desc-short">Environmental data management dashboard visualising biodiversity and usage metrics for Bangkok's green lung.</div>
-        <div class="proj-tags-row"><span class="proj-tag">Dashboard</span><span class="proj-tag">Data Viz</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t2">
+          <img src="img/DMS.png" alt="DMS Platform Bang Kachao" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB PLATFORM · INTERNSHIP PROJECT</div>
+          <div class="proj-title-card">DMS Platform Bang Kachao</div>
+          <div class="proj-desc-short">A destination management website for the Bang Kachao community — showcasing local products, services, and attractions to stimulate tourism.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Web Design</span><span class="proj-tag">Responsive</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 3. Art Therapy -->
       <a class="project-card reveal rd2" data-cat="web" onclick="openProj('arttherapy')">
-        <div class="proj-thumb t3"><div class="proj-thumb-inner t3"></div><div class="proj-emoji">🎨</div></div>
-        <div class="proj-info"><div class="proj-cat">INTERACTIVE WEB</div><div class="proj-title-card">Art Therapy Interactive Website</div>
-        <div class="proj-desc-short">An immersive website for art therapy, promoting mental health through creative digital activities.</div>
-        <div class="proj-tags-row"><span class="proj-tag">Interaction Design</span><span class="proj-tag">Animation</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t3">
+          <img src="img/arttherapy.png" alt="Art Therapy Interactive Website" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">INTERACTIVE WEB · SENIOR PROJECT</div>
+          <div class="proj-title-card">Art Therapy Interactive Website</div>
+          <div class="proj-desc-short">An immersive parallax website about art therapy with interactive activities — drawing, flower arrangement, painting, and expressive writing — for accessible mental wellbeing support.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Interaction Design</span><span class="proj-tag">HTML/CSS/JS</span><span class="proj-tag">Parallax</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 4. Gaab Gaab -->
       <a class="project-card reveal rd1" data-cat="mobile" onclick="openProj('gaabgaab')">
-        <div class="proj-thumb t4"><div class="proj-thumb-inner t4"></div><div class="proj-emoji">🐸</div></div>
-        <div class="proj-info"><div class="proj-cat">MOBILE APP</div><div class="proj-title-card">Gaab Gaab App</div>
-        <div class="proj-desc-short">A delightful mobile app with meticulous UI/UX that keeps users engaged and on-task.</div>
-        <div class="proj-tags-row"><span class="proj-tag">iOS Design</span><span class="proj-tag">User Flow</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t4">
+          <img src="img/gaabgaab.png" alt="Gaab Gaab App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · CLASS PROJECT</div>
+          <div class="proj-title-card">Gaab Gaab App</div>
+          <div class="proj-desc-short">An equipment borrowing and room reservation app for CMM students at KMUTT — featuring real-time availability, borrowing history, auto-fill, and multi-channel support.</div>
+          <div class="proj-tags-row"><span class="proj-tag">iOS Design</span><span class="proj-tag">User Flow</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 5. Wibwab -->
       <a class="project-card reveal rd2" data-cat="web" onclick="openProj('wibwab')">
-        <div class="proj-thumb t5"><div class="proj-thumb-inner t5"></div><div class="proj-emoji">💍</div></div>
-        <div class="proj-info"><div class="proj-cat">E-COMMERCE</div><div class="proj-title-card">Wibwab Accessories Web</div>
-        <div class="proj-desc-short">An editorial-aesthetic e-commerce site for accessories, designed for high conversion and brand storytelling.</div>
-        <div class="proj-tags-row"><span class="proj-tag">E-commerce UX</span><span class="proj-tag">Visual Design</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t5">
+          <img src="img/wibwab.png" alt="Wibwab Accessories Web" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">E-COMMERCE · CLASS PROJECT</div>
+          <div class="proj-title-card">Wibwab Accessories Web</div>
+          <div class="proj-desc-short">An e-commerce website specialising in jewellery — earrings, rings, and necklaces — designed for a seamless shopping experience and curated product discovery.</div>
+          <div class="proj-tags-row"><span class="proj-tag">E-commerce UX</span><span class="proj-tag">Figma</span><span class="proj-tag">C# .NET</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 6. Robinhood -->
       <a class="project-card reveal" data-cat="mobile" onclick="openProj('robinhood')">
-        <div class="proj-thumb t1"><div class="proj-thumb-inner t1"></div><div class="proj-emoji">🍜</div></div>
-        <div class="proj-info"><div class="proj-cat">MOBILE APP · REDESIGN</div><div class="proj-title-card">Redesign Robinhood</div>
-        <div class="proj-desc-short">UX/UI audit and redesign of the Robinhood food delivery app, improving discoverability and checkout flow.</div>
-        <div class="proj-tags-row"><span class="proj-tag">UX Audit</span><span class="proj-tag">Redesign</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t1">
+          <img src="img/robinhood.png" alt="Redesign Robinhood" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · REDESIGN · CLASS PROJECT</div>
+          <div class="proj-title-card">Redesign Robinhood</div>
+          <div class="proj-desc-short">UX redesign of the Robinhood food delivery app — fixing inaccurate location pinning, hidden delivery fees, missing reviews, and limited payment options.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX Redesign</span><span class="proj-tag">User Journey Map</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 7. Wash2Go -->
       <a class="project-card reveal rd1" data-cat="mobile" onclick="openProj('wash2go')">
-        <div class="proj-thumb t2"><div class="proj-thumb-inner t2"></div><div class="proj-emoji">🫧</div></div>
-        <div class="proj-info"><div class="proj-cat">MOBILE APP</div><div class="proj-title-card">Wash2Go</div>
-        <div class="proj-desc-short">On-demand laundry service app designed for speed and ease — from booking to tracking, frictionless.</div>
-        <div class="proj-tags-row"><span class="proj-tag">Service Design</span><span class="proj-tag">Mobile UX</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+        <div class="proj-thumb t2">
+          <img src="img/wash2go.png" alt="Wash2Go Laundry App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · CLASS PROJECT</div>
+          <div class="proj-title-card">Wash2Go Laundry App</div>
+          <div class="proj-desc-short">A laundry management system for both customers and shop owners — with machine tracking, reservations, loyalty points, online payments, and real-time business reporting.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Service Design</span><span class="proj-tag">Mobile UX</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
-      <a class="project-card reveal rd2" data-cat="brand" onclick="openProj('ohotokyo')">
-        <div class="proj-thumb t3"><div class="proj-thumb-inner t3"></div><div class="proj-emoji">✈️</div></div>
-        <div class="proj-info"><div class="proj-cat">BRANDING</div><div class="proj-title-card">Oho! Tokyo Branding</div>
-        <div class="proj-desc-short">Brand identity for a Tokyo travel business — playful, vibrant, and deeply memorable.</div>
-        <div class="proj-tags-row"><span class="proj-tag">Brand Identity</span><span class="proj-tag">Graphic Design</span></div>
-        <div class="proj-cta-hint">View Case Study →</div></div>
+      <!-- 8. MamaLoop -->
+      <a class="project-card reveal rd2" data-cat="mobile" onclick="openProj('mamaloop')">
+        <div class="proj-thumb t6">
+          <img src="img/mamaloop.png" alt="MamaLoop App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · SELF PROJECT</div>
+          <div class="proj-title-card">MamaLoop App</div>
+          <div class="proj-desc-short">A second-hand marketplace app dedicated to moms and kids — making it easy and safe to sell gently used baby items and find quality products at affordable prices.</div>
+          <div class="proj-tags-row"><span class="proj-tag">User Persona</span><span class="proj-tag">Marketplace UX</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
       </a>
 
+      <!-- 9. Oho! Tokyo -->
+      <a class="project-card reveal" data-cat="brand" onclick="openProj('ohotokyo')">
+        <div class="proj-thumb t3">
+          <img src="img/ohotokyo.png" alt="Oho! Tokyo Roll Pancake Branding" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">BRANDING · PART-TIME GRAPHIC DESIGNER</div>
+          <div class="proj-title-card">Oho! Tokyo Roll Pancake Branding</div>
+          <div class="proj-desc-short">Brand identity for a roll pancake shop — logo, nametag, and menu design with a vibrant, character-driven Japanese aesthetic created at Overprint Shop.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Logo Design</span><span class="proj-tag">Brand Identity</span><span class="proj-tag">Adobe Illustrator</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+  
+    </div>
+    <div style="text-align:center;margin-top:3rem" class="reveal">
+      <a class="btn-primary" onclick="goTo('allwork')" style="cursor:none;display:inline-block;justify-content:center">
+        See All Projects →
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ABOUT ME (HOMEPAGE) ═══════════════════ -->
+  <section id="about-home">
+    <div class="sec-label reveal">ABOUT ME</div>
+    <div class="sec-title reveal" style="margin-top:.5rem">Designing with <em>Intention</em>,<br>Every Single Time</div>
+    <div class="about-home-grid">
+      <div class="about-home-text reveal">
+        <p>Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from King Mongkut's University of Technology Thonburi (KMUTT) with a Bachelor of Science in Applied Computer Science–Multimedia, achieving a GPAX of 3.83 (First Class Honours).</p>
+        <p>With experience spanning startups, internships, and a current full-time role at Tech Invent Co., Ltd., I specialise in designing UX/UI that balances aesthetics with real-world usability — from enterprise web platforms to consumer mobile apps.</p>
+        <p>When I'm not designing, you'll find me exploring motion graphics, editorial design trends, and refining my personal visual language.</p>
+        <div class="chips-wrap">
+          <span class="chip">Figma</span><span class="chip">Prototyping</span><span class="chip">User Research</span>
+          <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe Illustrator</span>
+          <span class="chip">Adobe Photoshop</span><span class="chip">After Effects</span><span class="chip">HTML/CSS/JS</span>
+        </div>
+        <div class="about-home-actions">
+          <a href="mailto:kanokwan.premj@gmail.com" class="btn-primary">Say Hello →</a>
+        </div>
+      </div>
+      <div class="exp-list reveal rd1">
+        <div class="exp-list-label">EXPERIENCE</div>
+        <div class="exp-item">
+          <div class="exp-year">Jul 2025 – Now</div>
+          <div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Feb – Apr 2025</div>
+          <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">Botnoi Group Co., Ltd.</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products. Participated in the Botnoi Hackathon Sales Material 2025.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Jun – Aug 2024</div>
+          <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">LearnDo Co., Ltd.</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Jun 2023 – Jun 2024</div>
+          <div><div class="exp-role">Public Relations Team Member</div><div class="exp-company">Student Union of FIET, KMUTT</div><div class="exp-desc">Designed event posters and visual communication materials posted on Instagram and Facebook (@smofiet).</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Oct – Dec 2022</div>
+          <div><div class="exp-role">Graphic Designer (Part-time)</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral including logo, nametag, and menu for client projects.</div></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -401,19 +574,19 @@ footer span{color:var(--purple-mid)}
   <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
 </div>
 
-<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<!-- ═══════════════════ ABOUT PAGE (standalone) ═══════════════════ -->
 <div id="page-about" class="page">
   <div class="about-page-wrap">
     <div>
       <div class="sec-label">ABOUT ME</div>
       <div class="sec-title" style="margin-bottom:1.5rem">Designing with <em>Intention</em>,<br>Every Single Time</div>
-      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from KMUTT with a First Class Honours degree in Applied Computer Science (Multimedia).</p>
-      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">With experience across startups and tech companies, I specialise in designing UX/UI that balances aesthetics with real-world usability. Currently at Tech Invent Co., Ltd., I bring a detail-oriented, user-centred approach to every project.</p>
-      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted)">When I'm not designing, you'll find me exploring editorial design trends and refining my personal visual language.</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from King Mongkut's University of Technology Thonburi (KMUTT) with a Bachelor of Science in Applied Computer Science–Multimedia, achieving a GPAX of 3.83 (First Class Honours).</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">With experience spanning startups, internships, and a current full-time role at Tech Invent Co., Ltd., I specialise in designing UX/UI that balances aesthetics with real-world usability — from enterprise web platforms to consumer mobile apps.</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted)">When I'm not designing, you'll find me exploring motion graphics, editorial design trends, and refining my personal visual language.</p>
       <div class="chips-wrap">
         <span class="chip">Figma</span><span class="chip">Prototyping</span><span class="chip">User Research</span>
-        <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe XD</span>
-        <span class="chip">Usability Testing</span><span class="chip">HTML/CSS</span><span class="chip">Motion Design</span>
+        <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe Illustrator</span>
+        <span class="chip">Adobe Photoshop</span><span class="chip">After Effects</span><span class="chip">HTML/CSS/JS</span>
       </div>
       <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2.5rem">
         <a href="mailto:kanokwan.premj@gmail.com" class="btn-primary">Say Hello →</a>
@@ -422,20 +595,152 @@ footer span{color:var(--purple-mid)}
     </div>
     <div class="exp-list">
       <div class="exp-list-label">EXPERIENCE</div>
-      <div class="exp-item"><div class="exp-year">2024 – Now</div><div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div></div>
-      <div class="exp-item"><div class="exp-year">2023</div><div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Botnoi Group</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products.</div></div></div>
-      <div class="exp-item"><div class="exp-year">2022</div><div><div class="exp-role">UI Designer</div><div class="exp-company">LearnDo</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div></div>
-      <div class="exp-item"><div class="exp-year">2021</div><div><div class="exp-role">President of Design</div><div class="exp-company">KMUTT Student Union</div><div class="exp-desc">Led visual communication and event branding for the university student body.</div></div></div>
-      <div class="exp-item"><div class="exp-year">2020</div><div><div class="exp-role">Graphic Designer</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral, print materials, and product visual design.</div></div></div>
+      <div class="exp-item">
+        <div class="exp-year">Jul 2025 – Now</div>
+        <div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Feb – Apr 2025</div>
+        <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">Botnoi Group Co., Ltd.</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products. Participated in the Botnoi Hackathon Sales Material 2025.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Jun – Aug 2024</div>
+        <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">LearnDo Co., Ltd.</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Jun 2023 – Jun 2024</div>
+        <div><div class="exp-role">Public Relations Team Member</div><div class="exp-company">Student Union of FIET, KMUTT</div><div class="exp-desc">Designed event posters and visual communication materials posted on Instagram and Facebook (@smofiet).</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Oct – Dec 2022</div>
+        <div><div class="exp-role">Graphic Designer (Part-time)</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral including logo, nametag, and menu for client projects.</div></div>
+      </div>
     </div>
   </div>
   <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
 </div>
 
 <!-- ═══════════════════ PROJECT DETAIL ═══════════════════ -->
+ <!-- ═══════════════════ ALL WORK PAGE ═══════════════════ -->
+<div id="page-allwork" class="page">
+  <section style="padding-top:8rem">
+    
+    <div class="work-header">
+      <div>
+        <div class="sec-label">ALL PROJECTS</div>
+        <div class="sec-title" style="margin-top:.5rem">
+          All <em>Works</em>
+        </div>
+      </div>
+
+      <!-- FILTER -->
+      <div class="work-filter">
+        <button class="filter-btn active" onclick="filterAll('all',this)">All</button>
+        <button class="filter-btn" onclick="filterAll('uxui',this)">UX/UI</button>
+        <button class="filter-btn" onclick="filterAll('other',this)">Other Works</button>
+      </div>
+    </div>
+
+    <!-- GRID -->
+   <div class="projects-grid" id="allProjGrid">
+
+  <!-- ===== UX/UI PROJECTS ===== -->
+
+  <a class="project-card" data-type="uxui" onclick="openProj('automotive')">
+    <div class="proj-thumb"><img src="img/automotive.jpg"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Web App</div>
+      <div class="proj-title-card">Automotive Insurance Platform</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('elearning')">
+    <div class="proj-thumb"><img src="portfolio/img/elearning.jpg"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Web Platform</div>
+      <div class="proj-title-card">E-learning Platform</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('bangkachao')">
+    <div class="proj-thumb"><img src="img/DMS.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Web</div>
+      <div class="proj-title-card">DMS Platform Bang Kachao</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('arttherapy')">
+    <div class="proj-thumb"><img src="img/arttherapy.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Interactive</div>
+      <div class="proj-title-card">Art Therapy Website</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('gaabgaab')">
+    <div class="proj-thumb"><img src="img/gaabgaab.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Mobile</div>
+      <div class="proj-title-card">Gaab Gaab App</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('wibwab')">
+    <div class="proj-thumb"><img src="img/wibwab.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · E-commerce</div>
+      <div class="proj-title-card">Wibwab Accessories</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('robinhood')">
+    <div class="proj-thumb"><img src="img/robinhood.png"></div> 
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Redesign</div>
+      <div class="proj-title-card">Robinhood Redesign</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('wash2go')">
+    <div class="proj-thumb"><img src="img/wash2go.png"></div> 
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Service</div>
+      <div class="proj-title-card">Wash2Go App</div>
+    </div>
+  </a>
+
+  <a class="project-card" data-type="uxui" onclick="openProj('mamaloop')">
+    <div class="proj-thumb"><img src="img/mamaloop.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">UX/UI · Marketplace</div>
+      <div class="proj-title-card">MamaLoop App</div>
+    </div>
+  </a>
+
+  <!-- ===== OTHER WORKS ===== -->
+
+  <a class="project-card" data-type="other" onclick="openProj('ohotokyo')">
+    <div class="proj-thumb"><img src="img/ohotokyo.png"></div>
+    <div class="proj-info">
+      <div class="proj-cat">Branding</div>
+      <div class="proj-title-card">Oho! Tokyo Branding</div>
+    </div>
+  </a>
+
+</div>
+
+    <div style="text-align:center;margin-top:3rem">
+      <a class="btn-secondary" onclick="goTo('home')">← Back to Home</a>
+    </div>
+
+  </section>
+
+  <footer><span>© 2025 Kanokwan Premjit</span></footer>
+</div>
 <div id="page-project" class="page">
   <div class="proj-detail-wrap">
-    <div class="back-link" onclick="goTo('home');raf(()=>scrollTo('work'))">← Back to Work</div>
+    <div class="back-link" onclick="navGoTo('home','work')">← Back to Work</div>
     <div class="proj-hero-grid" id="pdHero"></div>
     <div class="proj-sections" id="pdBody"></div>
     <div class="proj-pagination" id="pdNav"></div>
@@ -443,73 +748,154 @@ footer span{color:var(--purple-mid)}
   <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
 </div>
 
+<!-- 🔒 PASSWORD MODAL -->
+<div id="passwordModal" class="pw-modal">
+  <div class="pw-box" style="position:relative">
+    <button class="pw-close" onclick="closePasswordModal()">✕</button>
+    <div class="pw-title">🔒 Protected Project</div>
+    <div class="pw-desc">This project is confidential. Please enter password to continue.</div>
+    <div class="pw-input-wrap">
+      <input type="password" id="pwInput" placeholder="Enter password..." />
+      <button type="button" class="pw-eye" onclick="togglePassword()">
+        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="pw-error" id="pwError">Incorrect password</div>
+    <button class="pw-btn" onclick="submitPassword()">Unlock →</button>
+    <p class="modal-hint">For HR purposes only. Contact <strong>kanokwan.premj@gmail.com</strong> to request access.</p>
+  </div>
+</div>
+
 <script>
 /* ── DATA ─────────────────────────────────────── */
 const PD={
-  automotive:{id:'automotive',emoji:'🚗',tc:'t1',cat:'WEB APPLICATION',title:'Automotive Insurance Platform',
-    summary:'A full redesign of an automotive insurance web platform focused on reducing cognitive load and improving purchase completion for first-time buyers.',
-    role:'Lead UX/UI Designer',duration:'3 Months',tools:'Figma, Maze, Miro',
-    challenge:'The original platform had a 68% drop-off rate during policy selection. Users were overwhelmed by jargon and unclear pricing structures.',
-    process:'Conducted 12 user interviews and 3 rounds of card sorting. Built an affinity map to cluster pain points, then ran 5 design sprints to simplify coverage selection. High-fidelity prototypes were tested with 20 participants via remote usability sessions.',
-    outcome:'The redesigned flow reduced average time-on-task from 8 minutes to 3.5 minutes, and the prototype showed a 42% improvement in task completion.',
-    outcomes:[{n:'42%',l:'Task Completion Lift'},{n:'3.5 min',l:'Avg. Time on Task'},{n:'87%',l:'Satisfaction Score'}],
-    tags:['UX Research','UI Design','Prototype','Usability Testing'],prev:'ohotokyo',next:'bangkachao'},
-  bangkachao:{id:'bangkachao',emoji:'🌿',tc:'t2',cat:'DASHBOARD',title:'DMS Platform Bang Kachao',
-    summary:"An environmental data management dashboard for Bang Kachao — Bangkok's green lung — helping rangers visualise biodiversity, visitor flow, and conservation progress.",
-    role:'UX/UI Designer',duration:'4 Months',tools:'Figma, Adobe Illustrator',
-    challenge:'Stakeholders needed a single view of fragmented datasets. Existing tools were spreadsheet-based and inaccessible to non-technical rangers.',
-    process:'Ran discovery workshops with park rangers, conservation researchers, and the Bangkok Metropolitan Administration. Created information architecture maps and ran three rounds of co-design sessions.',
-    outcome:'The dashboard is now in active use, consolidating 5 previously separate data sources into one accessible interface.',
-    outcomes:[{n:'5',l:'Data Sources Unified'},{n:'3×',l:'Faster Reporting'},{n:'100%',l:'Stakeholder Adoption'}],
-    tags:['Dashboard','Data Visualisation','Stakeholder Research'],prev:'automotive',next:'arttherapy'},
-  arttherapy:{id:'arttherapy',emoji:'🎨',tc:'t3',cat:'INTERACTIVE WEB',title:'Art Therapy Interactive Website',
-    summary:'An immersive browser-based experience guiding users through creative art therapy exercises to support emotional wellbeing — no downloads, no account needed.',
-    role:'UX/UI & Interaction Designer',duration:'2 Months',tools:'Figma, HTML/CSS/JS',
-    challenge:'Mental health resources online are often clinical and intimidating. The brief called for something warm, playful, and instantly accessible — particularly for teenagers.',
-    process:'Developed user personas based on mental health research. Designed a non-linear interaction model where users choose their emotional starting point. Prototyped and tested with 15 participants aged 16–24.',
-    outcome:'92% of test users completed at least one full therapy module without prompting, rating the experience 4.8/5 for emotional safety.',
-    outcomes:[{n:'92%',l:'Module Completion'},{n:'4.8/5',l:'Emotional Safety Score'},{n:'15',l:'Test Participants'}],
-    tags:['Interaction Design','Motion Design','HTML/CSS','Mental Health UX'],prev:'bangkachao',next:'gaabgaab'},
-  gaabgaab:{id:'gaabgaab',emoji:'🐸',tc:'t4',cat:'MOBILE APP',title:'Gaab Gaab App',
-    summary:'A mobile app with personality — Gaab Gaab uses playful visuals and a carefully crafted information hierarchy to help users stay organised and engaged.',
-    role:'UI/UX Designer',duration:'6 Weeks',tools:'Figma, Principle',
-    challenge:'Productivity apps often feel sterile. The challenge was to create a task management experience that felt genuinely fun without sacrificing clarity.',
-    process:'Ran competitive analysis across 8 apps. Defined a character-driven design language and component library. Tested 3 navigation models with target users aged 18–28.',
-    outcome:'Prototype testing showed a 34% higher daily return rate compared to a baseline app in A/B sessions.',
-    outcomes:[{n:'34%',l:'Higher Return Rate'},{n:'8',l:'Apps Analysed'},{n:'4.6/5',l:'Usability Score'}],
-    tags:['iOS Design','User Flow','Motion','Character Design'],prev:'arttherapy',next:'wibwab'},
-  wibwab:{id:'wibwab',emoji:'💍',tc:'t5',cat:'E-COMMERCE',title:'Wibwab Accessories Web',
-    summary:'An editorial-first e-commerce website for an accessories brand, designed to tell the brand story while driving product discovery and conversion.',
-    role:'UX/UI Designer',duration:'8 Weeks',tools:'Figma, Shopify',
-    challenge:"The brand's Instagram aesthetic wasn't translating to their existing store. Bounce rate was high and average order value was low.",
-    process:'Analysed heatmaps and conducted 10 customer interviews. Rebuilt the product page hierarchy with editorial photography at its core. Introduced curated "look" bundles to increase basket size.',
-    outcome:'The redesigned store achieved a 28% increase in average session duration and a 19% lift in average order value within the first month.',
-    outcomes:[{n:'+28%',l:'Session Duration'},{n:'+19%',l:'Avg. Order Value'},{n:'↓41%',l:'Bounce Rate Drop'}],
-    tags:['E-commerce UX','Visual Design','Shopify','Conversion Optimisation'],prev:'gaabgaab',next:'robinhood'},
-  robinhood:{id:'robinhood',emoji:'🍜',tc:'t1',cat:'MOBILE APP · REDESIGN',title:'Redesign Robinhood',
-    summary:"A UX audit and concept redesign of Robinhood Thailand's food delivery app, addressing discoverability gaps and streamlining checkout.",
-    role:'UX Researcher & UI Designer',duration:'4 Weeks',tools:'Figma, Maze',
-    challenge:'The existing app suffered from poor restaurant discoverability and a multi-step checkout causing abandonment. Heuristic evaluation revealed 11 usability violations.',
-    process:"Completed a full heuristic evaluation using Nielsen's 10 principles. Mapped the as-is journey and identified 6 critical friction points. Redesigned search, restaurant pages, and checkout.",
-    outcome:'10 out of 12 Robinhood users preferred the redesigned checkout flow. Task completion improved from 71% to 94%.',
-    outcomes:[{n:'94%',l:'Task Completion'},{n:'11',l:'Issues Resolved'},{n:'10/12',l:'Users Preferred Redesign'}],
-    tags:['UX Audit','Heuristic Evaluation','Redesign','Mobile UX'],prev:'wibwab',next:'wash2go'},
-  wash2go:{id:'wash2go',emoji:'🫧',tc:'t2',cat:'MOBILE APP',title:'Wash2Go',
-    summary:'An on-demand laundry service app for busy urban users — fast booking, real-time tracking, and an interface that makes a mundane task feel effortless.',
-    role:'UX/UI Designer',duration:'5 Weeks',tools:'Figma, ProtoPie',
-    challenge:'Users of existing laundry apps reported confusion around pricing, pickup times, and order status. The goal was radical simplicity.',
-    process:'Shadowed 6 users through weekly laundry routines. Built 4 competing prototypes and ran rapid preference tests. Settled on single-screen booking with inline pricing transparency.',
-    outcome:'Single-screen booking reduced average booking time to under 60 seconds. Test users rated ease-of-use at 4.9/5.',
-    outcomes:[{n:'<60s',l:'Booking Time'},{n:'4.9/5',l:'Ease of Use'},{n:'6',l:'Research Sessions'}],
-    tags:['Service Design','Mobile UX','ProtoPie','Contextual Research'],prev:'robinhood',next:'ohotokyo'},
-  ohotokyo:{id:'ohotokyo',emoji:'✈️',tc:'t3',cat:'BRANDING',title:'Oho! Tokyo Branding',
-    summary:'A complete brand identity for a Tokyo travel experience business — vibrant, characterful, and designed to stop the scroll on social media.',
-    role:'Brand & Graphic Designer',duration:'3 Weeks',tools:'Figma, Adobe Illustrator',
-    challenge:'The client wanted to stand out in a saturated travel market targeting Thai millennials seeking curated, Instagram-worthy Japan experiences.',
-    process:'Ran brand workshops to define tone of voice and visual pillars. Explored 3 concept directions. Developed the chosen direction across logo, colour system, typography, social templates, and print collateral.',
-    outcome:'The brand launched across Instagram and LINE gaining 2,000 followers in two weeks. The client reported a 3× increase in inquiry messages post-rebrand.',
-    outcomes:[{n:'2K',l:'Followers in 2 Weeks'},{n:'3×',l:'Inquiry Volume'},{n:'3',l:'Concepts Explored'}],
-    tags:['Brand Identity','Logo Design','Graphic Design','Social Media'],prev:'wash2go',next:'automotive'}
+elearning:{
+  id:'elearning',img:'portfolio/img/elearning.jpg',tc:'t10',
+  cat:'WEB PLATFORM · INTERNSHIP PROJECT',
+  title:'E-learning Platform',
+  summary:'An online learning platform designed to make education more accessible and engaging through structured courses, video-based learning, and interactive assessments.',
+  role:'UX/UI Designer',duration:'Internship at LearnDo Co., Ltd.',tools:'Figma',
+  challenge:'Traditional learning systems were difficult to navigate, lacked engagement, and did not provide clear progress tracking for users.',
+  process:'Designed user flows for students and instructors, created dashboards for course management, and improved learning experience through structured content, video modules, and quizzes.',
+  outcome:'A user-friendly platform that improves learning engagement, allows easy course access, and provides clear progress tracking for users.',
+  outcomes:[{n:'✓',l:'Improved Learning Experience'},{n:'✓',l:'Clear Progress Tracking'},{n:'✓',l:'Interactive Courses'}],
+  tags:['UX/UI Design','Dashboard','E-learning','Figma'],prev:'ohotokyo',next:'automotive'
+},
+automotive:{
+  id:'automotive',img:'img/automotive.jpg',tc:'t1',
+  cat:'WEB APPLICATION · PROFESSIONAL PROJECT (CONFIDENTIAL)',
+  title:'Automotive Insurance Platform',
+  summary:'A web-based insurance platform for internal staff and car dealers, replacing a legacy Windows desktop system that had been in use for over 10 years. Due to an NDA, some details have been modified.',
+  role:'UX/UI Designer',duration:'Professional Project',tools:'Figma',
+  challenge:'The legacy system created major usability challenges, especially for new employees. Workflows were complex and unintuitive, forms were excessively long, onboarding was difficult, there was no dashboard overview for different user roles, and the system design was misaligned with real-world workflows.',
+  process:'The core insight was that the main issue was not user capability, but a mismatch between the system design and actual user workflows. Redesigned workflows to be intuitive and task-oriented, reduced form complexity, and introduced role-based dashboards for better data visibility.',
+  outcome:'Improved onboarding experience for new employees, reduced confusion in daily operations, enabled faster access to key information, and achieved better alignment with real user workflows.',
+  outcomes:[{n:'✓',l:'Simplified Workflows'},{n:'✓',l:'Role-based Dashboard'},{n:'✓',l:'Faster Onboarding'}],
+  tags:['UX Research','UI Design','Workflow Redesign','Figma'],prev:'ohotokyo',next:'bangkachao'
+},
+bangkachao:{
+  id:'bangkachao',img:'img/DMS.png',tc:'t2',
+  cat:'WEB PLATFORM · INTERNSHIP PROJECT',
+  title:'DMS Platform Bang Kachao',
+  summary:"A destination management website for the Bang Kachao community designed to improve the quality of life for locals by bringing their products and services online and stimulating tourist interest. Designed in both mobile and desktop versions.",
+  role:'UX/UI Designer',duration:'Internship at LearnDo Co., Ltd.',tools:'Figma',
+  challenge:'The Bang Kachao community needed a digital platform to showcase local products, services, and attractions. Existing channels were fragmented and not easily accessible to tourists or buyers.',
+  process:"Designed a responsive website with both mobile and desktop versions. Focused on clear product listings, tourism content, and an accessible navigation structure that serves both locals and visitors. Used a natural green colour palette (#10443e, #32745c, #67a49c, #ede4d7) to reflect the area's identity.",
+  outcome:'The platform brings together local products and services in one accessible place, helping community members reach a wider audience and making it easier for tourists to discover Bang Kachao.',
+  outcomes:[{n:'2',l:'Platform Versions (Mobile & Desktop)'},{n:'✓',l:'Community Marketplace'},{n:'✓',l:'Tourism Content Hub'}],
+  tags:['Web Design','Responsive Design','Community UX','Figma'],prev:'automotive',next:'arttherapy'
+},
+arttherapy:{
+  id:'arttherapy',img:'img/arttherapy.jpg',tc:'t3',
+  cat:'INTERACTIVE WEB · SENIOR PROJECT',
+  title:'The Interactive Website About Art Therapy',
+  summary:'An immersive parallax website providing knowledge about art therapy — a method for reducing stress through creative activities. Includes interactive trial activities (drawing, flower arrangement, painting, expressive writing) accessible without needing to visit a physical location.',
+  role:'UX/UI & Interaction Designer',duration:'Senior Project',tools:'Figma, HTML, CSS, JavaScript',
+  challenge:'Mental health resources are often clinical and inaccessible. The project aimed to create a warm, interactive space where users could freely explore art therapy concepts and activities at their own pace, from anywhere.',
+  process:'Developed an interactive parallax experience using HTML, CSS, and JavaScript. Designed trial activities for each art therapy type. Built the site to be freely accessible — no account or download required. Used a soft, welcoming colour palette (#f7e9dc, #97c7eb, #5aa2ca, #328d61, #f195bc, #f5793b).',
+  outcome:'A live, publicly accessible website that delivers both educational content about art therapy and hands-on interactive activities. Users can freely express thoughts and emotions through the creative exercises provided.',
+  outcomes:[{n:'4',l:'Interactive Activity Types'},{n:'✓',l:'Parallax Experience'},{n:'✓',l:'Publicly Accessible'}],
+  tags:['Interaction Design','HTML/CSS/JS','Parallax','Mental Health UX'],prev:'bangkachao',next:'gaabgaab'
+},
+gaabgaab:{
+  id:'gaabgaab',img:'img/gaabgaab.jpg',tc:'t4',
+  cat:'MOBILE APP · CLASS PROJECT',
+  title:'Gaab Gaab App',
+  summary:'An equipment borrowing and room reservation app for students in the Applied Computer Science–Multimedia (CMM) program at KMUTT. Streamlines booking and returning equipment or classrooms with real-time availability, queue tracking, and borrowing history.',
+  role:'UX/UI Designer',duration:'Class Project',tools:'Figma',
+  challenge:'The existing borrowing process required filling in many details repeatedly with no images of items, an overly complex form, no search function, and phone-only staff contact — causing friction for frequent borrowers.',
+  process:'Mapped the user flow from home → item selection → availability check → form fill → confirmation. Designed solutions including item/room image display, search by name, auto-fill for repeat users, multiple contact channels (chat), borrowing history, and return date reminders.',
+  outcome:'A streamlined app prototype that makes equipment borrowing significantly faster and less frustrating for CMM students, with clear visual feedback at every step.',
+  outcomes:[{n:'✓',l:'Real-time Availability'},{n:'✓',l:'Auto-fill & History'},{n:'✓',l:'Multi-channel Support'}],
+  tags:['iOS Design','User Flow','Figma','Student UX'],prev:'arttherapy',next:'wibwab'
+},
+wibwab:{
+  id:'wibwab',img:'img/wibwab.jpg',tc:'t5',
+  cat:'E-COMMERCE · CLASS PROJECT',
+  title:'Wibwab Accessories Web',
+  summary:'An e-commerce website specialising in jewellery — earrings, rings, and necklaces — providing customers with a seamless shopping experience through a curated collection of stylish, high-quality accessories.',
+  role:'UX/UI Designer',duration:'Class Project',tools:'Figma, C# .NET',
+  challenge:'Create a fully functional e-commerce platform with clear product browsing, product detail pages, shopping cart, and checkout — while maintaining a cohesive, editorial visual identity that reflects the brand.',
+  process:'Designed in Figma and implemented with C# .NET. Built out key screens including home, product listings by category, product detail pages, cart, and checkout with multiple payment options.',
+  outcome:'A complete, functional e-commerce UI with a clean, premium aesthetic suited to an accessories brand, covering the full shopping journey from discovery to checkout.',
+  outcomes:[{n:'✓',l:'Full Shopping Journey'},{n:'✓',l:'Category Navigation'},{n:'✓',l:'Multi-payment Checkout'}],
+  tags:['E-commerce UX','Visual Design','Figma','C# .NET'],prev:'gaabgaab',next:'robinhood'
+},
+robinhood:{
+  id:'robinhood',img:'img/robinhood.jpg',tc:'t1',
+  cat:'MOBILE APP · REDESIGN · CLASS PROJECT',
+  title:'Redesign Robinhood',
+  summary:"A UX redesign of the Robinhood Thailand food delivery app, addressing key usability pain points identified through user journey mapping. Focused on location accuracy, fee transparency, review visibility, homepage layout, and payment options.",
+  role:'UX Researcher & UI Designer',duration:'Class Project',tools:'Figma',
+  challenge:'Key problems included: inaccurate location pinning, delivery fees hidden until checkout, inability to view product and shop reviews, recommended shops placed too far from the product list, and only two banks available for mobile banking payments.',
+  process:'Created a User Journey Map using the persona of Miss Nuttanit (female, 20, university student) wanting to order Mala food. Mapped needs/wants, actions, pain points, and opportunities across each step. Redesigned the search, restaurant page, homepage layout, and checkout flow.',
+  outcome:'Redesigned solutions: precise location pinning, delivery fee displayed on restaurant main page, product and shop reviews added, homepage layout adjusted for better visibility, and more bank options added for mobile banking.',
+  outcomes:[{n:'5',l:'Pain Points Resolved'},{n:'✓',l:'Journey Map Driven'},{n:'✓',l:'Prototype Available'}],
+  tags:['UX Redesign','User Journey Map','Heuristic Evaluation','Figma'],prev:'wibwab',next:'wash2go'
+},
+wash2go:{
+  id:'wash2go',img:'img/wash2go.jpg',tc:'t2',
+  cat:'MOBILE APP · CLASS PROJECT',
+  title:'Wash2Go Laundry App',
+  summary:"A laundry management system designed for both customers and business owners — solving machine availability, payment, timing uncertainty, and operational visibility problems through a dual-interface mobile app.",
+  role:'UX/UI Designer',duration:'Class Project',tools:'Figma',
+  challenge:"Customers faced full machines, no bank transfer payment, uncertainty about timing, and no easy support channel. Business owners couldn't view daily reports, had to visit each branch, and struggled to plan maintenance.",
+  process:'Designed two separate user experiences — a customer app and a business owner dashboard. Customer features include available machine tracking, reservation system, loyalty points, online payments, and an automated notifications/support bot. Owner features include real-time business reporting, data analytics, and machine usage monitoring.',
+  outcome:'A comprehensive dual-sided platform that makes laundry management frictionless for users and gives business owners full operational visibility without needing to be on-site.',
+  outcomes:[{n:'2',l:'User Sides (Customer & Owner)'},{n:'8',l:'Core Feature Solutions'},{n:'✓',l:'Real-time Reporting'}],
+  tags:['Service Design','Mobile UX','Dual Interface','Figma'],prev:'robinhood',next:'mamaloop'
+},
+mamaloop:{
+  id:'mamaloop',img:'img/mamaloop.jpg',tc:'t6',
+  cat:'MOBILE APP · SELF PROJECT',
+  title:'MamaLoop App',
+  summary:'A second-hand marketplace app dedicated to mothers and children — enabling moms to sell gently used baby items and pass them on to other mothers looking for quality products at affordable prices.',
+  role:'UX/UI Designer',duration:'Self Project',tools:'Figma',
+  challenge:"Kids outgrow items quickly, leaving clothes and car seats barely used. Most moms lack the time or trust to manage selling across multiple platforms, and buyers can't easily find safe, reliable secondhand baby items.",
+  process:"Developed two user personas: Mei (seller, freelancer, 32, 1-year-old baby) and Praew (buyer, office worker, 28, 3-month-old baby). Designed a dedicated niche marketplace with trust features, age-range filters, and a streamlined listing flow. Used a warm, trustworthy colour palette (#f3ebe3, #d1b89f, #735240, #e3edf2, #7ea9c0).",
+  outcome:'A focused, niche marketplace prototype tailored specifically to the needs of mothers — easy to use, reliable, and built with features that address the unique challenges of buying and selling baby items.',
+  outcomes:[{n:'2',l:'User Personas Defined'},{n:'✓',l:'Niche Marketplace Design'},{n:'✓',l:'Trust-focused Features'}],
+  tags:['User Persona','Marketplace UX','Mobile Design','Figma'],prev:'wash2go',next:'ohotokyo'
+},
+ohotokyo:{
+  id:'ohotokyo',img:'img/ohotokyo.jpg',tc:'t3',
+  cat:'BRANDING · PART-TIME GRAPHIC DESIGNER',
+  title:'Oho! Tokyo Roll Pancake Branding',
+  summary:'Brand identity for a roll pancake shop (โอ้โห! โตเกียว / Oho! Tokyo) — including logo design, nametag, and menu. Created during a part-time role as Graphic Designer at Overprint Shop using Adobe Illustrator.',
+  role:'Graphic Designer',duration:'Part-time at Overprint Shop (Oct–Dec 2022)',tools:'Adobe Illustrator',
+  challenge:'Design a memorable, character-driven brand identity for a roll pancake shop with a fun Japanese-inspired personality that works across logo, packaging, and printed menu materials.',
+  process:'Developed a distinctive mascot-based logo featuring a wide-eyed illustrated character with a Japanese aesthetic. Applied the identity across business card / nametag design, product packaging (paper bags with sticker labels), and a full printed menu. Colour palette: #f52544, #f46d7f, #f6b8a2.',
+  outcome:'A cohesive, vibrant brand identity that brings personality and consistency to the shop across all customer touchpoints — from the logo to the menu and packaging.',
+  outcomes:[{n:'3',l:'Deliverables (Logo, Nametag, Menu)'},{n:'✓',l:'Character-driven Identity'},{n:'✓',l:'Print-ready Assets'}],
+  tags:['Logo Design','Brand Identity','Graphic Design','Adobe Illustrator'],prev:'mamaloop',next:'automotive'
+}
 };
 
 /* ── ROUTING ──────────────────────────────────── */
@@ -519,11 +905,30 @@ function goTo(name){
   window.scrollTo({top:0,behavior:'instant'});
   setTimeout(initReveal,80);
 }
-function raf(fn){requestAnimationFrame(fn)}
-function scrollTo(id){
+
+/* ─── สำคัญ: เปลี่ยนชื่อจาก scrollTo เป็น scrollToSection เพื่อไม่ชนกับ window.scrollTo ─── */
+function scrollToSection(id){
   const el=document.getElementById(id);
-  if(el)el.scrollIntoView({behavior:'smooth'});
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+/* navGoTo: ไปหน้า home ก่อน แล้วรอ DOM render เสร็จจึง scroll ไปส่วนที่ต้องการ */
+function navGoTo(pageName, sectionId){
+  const currentPage = document.querySelector('.page.active');
+  const isAlreadyHome = currentPage && currentPage.id === 'page-' + pageName;
+
+  closeMobile();
+
+  if(isAlreadyHome){
+    /* อยู่หน้า home อยู่แล้ว → scroll ตรงเลย */
+    scrollToSection(sectionId);
+  } else {
+    /* ต้องสลับหน้าก่อน แล้วค่อย scroll */
+    goTo(pageName);
+    setTimeout(()=> scrollToSection(sectionId), 120);
+  }
+}
+
 function closeMobile(){document.getElementById('mobileNav').classList.remove('open')}
 
 /* ── OPEN PROJECT ─────────────────────────────── */
@@ -536,15 +941,23 @@ function openProj(id){
       <p class="proj-summary-text">${p.summary}</p>
       <div class="proj-meta-row">
         <div class="proj-meta-item"><div class="meta-label">ROLE</div><div class="meta-val">${p.role}</div></div>
-        <div class="proj-meta-item"><div class="meta-label">DURATION</div><div class="meta-val">${p.duration}</div></div>
+        <div class="proj-meta-item"><div class="meta-label">CONTEXT</div><div class="meta-val">${p.duration}</div></div>
         <div class="proj-meta-item"><div class="meta-label">TOOLS</div><div class="meta-val">${p.tools}</div></div>
       </div>
     </div>
-    <div class="proj-cover-box ${p.tc}">${p.emoji}</div>`;
+    <div class="proj-cover-box ${p.tc}">
+      <img src="${p.img}" alt="${p.title}" onerror="this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.style.display='none'">
+    </div>`;
 
   document.getElementById('pdBody').innerHTML=`
     <div class="proj-section"><div class="proj-sec-title">The Challenge</div><p class="proj-sec-body">${p.challenge}</p></div>
-    <div class="proj-section"><div class="proj-sec-title">Process</div><p class="proj-sec-body">${p.process}</p><div class="proj-img-mock">${p.emoji}</div></div>
+    <div class="proj-section">
+      <div class="proj-sec-title">Process</div>
+      <p class="proj-sec-body">${p.process}</p>
+      <div class="proj-img-mock">
+        <img src="${p.img}" alt="${p.title} process" onerror="this.parentElement.style.background='linear-gradient(135deg,var(--purple-light),var(--cream-mid))';this.style.display='none'">
+      </div>
+    </div>
     <div class="proj-section"><div class="proj-sec-title">Outcome</div><p class="proj-sec-body">${p.outcome}</p>
       <div class="outcomes-grid">${p.outcomes.map(o=>`<div class="outcome-card"><div class="outcome-num">${o.n}</div><div class="outcome-label">${o.l}</div></div>`).join('')}</div>
     </div>
@@ -555,7 +968,7 @@ function openProj(id){
   const pv=PD[p.prev],nx=PD[p.next];
   document.getElementById('pdNav').innerHTML=`
     <span class="page-link" onclick="openProj('${pv.id}')">← ${pv.title}</span>
-    <a class="btn-primary" onclick="goTo('home');raf(()=>scrollTo('work'))">All Projects</a>
+    <a class="btn-primary" onclick="navGoTo('home','work')">All Projects</a>
     <span class="page-link" onclick="openProj('${nx.id}')">${nx.title} →</span>`;
 
   goTo('project');
@@ -601,6 +1014,92 @@ function filterProj(cat,btn){
   });
   const f=document.querySelector('.project-card.featured');
   if(f)f.style.gridColumn=(cat==='all'||cat==='web')?'span 2':'span 1';
+}
+
+/* ── PASSWORD PROTECTION ───────────────────────── */
+const PROJECT_PASSWORD = "Pass_1234";
+const PROTECTED_PROJECTS = ["automotive", "elearning"];
+
+let isUnlocked = sessionStorage.getItem("projUnlocked") === "true";
+let pendingProject = null;
+
+const modal = document.getElementById("passwordModal");
+const input = document.getElementById("pwInput");
+const error = document.getElementById("pwError");
+
+function openPasswordModal(projectId){
+  pendingProject = projectId;
+  modal.classList.add("show");
+  input.value = "";
+  error.style.display = "none";
+  setTimeout(()=>input.focus(),100);
+}
+
+function closePasswordModal(){
+  modal.classList.remove("show");
+}
+
+function submitPassword(){
+  if(input.value === PROJECT_PASSWORD){
+    sessionStorage.setItem("projUnlocked","true");
+    isUnlocked = true;
+    closePasswordModal();
+    _openProjCore(pendingProject);
+  }else{
+    error.style.display = "block";
+  }
+}
+
+input.addEventListener("keydown",e=>{
+  if(e.key === "Enter") submitPassword();
+});
+
+/* เก็บ core function แยกไว้ ไม่ต้อง override */
+const _openProjCore = openProj;
+
+openProj = function(id){
+  const isProtected = PROTECTED_PROJECTS.includes(id);
+  if(isProtected && !isUnlocked){
+    openPasswordModal(id);
+    return;
+  }
+  _openProjCore(id);
+};
+
+function togglePassword(){
+  const inp = document.getElementById("pwInput");
+  const eyeBtn = document.querySelector(".pw-eye");
+  if(inp.type === "password"){
+    inp.type = "text";
+    eyeBtn.classList.add("active");
+  }else{
+    inp.type = "password";
+    eyeBtn.classList.remove("active");
+  }
+}
+
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape") closePasswordModal();
+});
+
+function filterAll(type, btn){
+  document.querySelectorAll('#page-allwork .filter-btn')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('#allProjGrid .project-card')
+    .forEach(card=>{
+      if(type === 'all'){
+        card.style.display = 'block';
+      } else {
+        card.style.display = card.dataset.type === type ? 'block' : 'none';
+      }
+    });
+}
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo(0,0);
 }
 </script>
 </body>
