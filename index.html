@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanokwan Premjit — UX/UI Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;1,200;1,300&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" hef="img/logo.png">
+<style>
+:root{--white:#FAFAF8;--cream:#F0EDE4;--cream-mid:#E8E3D8;--purple-light:#EAE6FA;--purple-mid:#C9C0F0;--purple:#7B6FCD;--purple-deep:#4A3FA0;--ink:#1A1830;--ink-mid:#3D3960;--muted:#8C88A8;--border:rgba(123,111,205,.15)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Kanit',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;cursor:none}
+
+/* ── PASSWORD MODAL ───────────────────────── */
+.pw-modal{position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:all .3s ease}
+.pw-modal.show{opacity:1;pointer-events:auto}
+.pw-box{width:340px;background:rgba(255,255,255,.75);backdrop-filter:blur(20px);border:1px solid rgba(123,111,205,.2);border-radius:1.2rem;padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-hint{font-size:0.72rem;font-weight:300;letter-spacing:.03em;color:var(--muted);margin-top:0.75rem;text-align:center;line-height:1.5}
+.pw-title{font-size:1.2rem;font-weight:500;color:var(--ink);margin-bottom:.5rem}
+.pw-desc{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+#pwInput{width:100%;padding:.7rem 1rem;border-radius:.8rem;border:1px solid var(--cream-mid);font-family:'Kanit',sans-serif;outline:none;margin-bottom:.6rem}
+#pwInput:focus{border-color:var(--purple-mid)}
+.pw-error{font-size:.75rem;color:#e74c3c;margin-bottom:.8rem;display:none}
+.pw-btn{width:100%;padding:.7rem;border:none;border-radius:2rem;background:var(--purple-deep);color:white;font-family:'Kanit',sans-serif;cursor:pointer;transition:.25s}
+.pw-btn:hover{transform:translateY(-1px);box-shadow:0 10px 25px rgba(74,63,160,.3)}
+
+/* ── PROTECTED PROJECT ───────────────────────── */
+.project-card.protected .proj-thumb img{filter:blur(6px) brightness(.85);transform:scale(1.05)}
+.project-card.protected:hover .proj-thumb img{filter:blur(2px) brightness(.95)}
+.project-card.protected .proj-thumb::after{content:"Confidential Project 🔒 HR Access Only";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;letter-spacing:.1em;color:white;background:linear-gradient(to top,rgba(0,0,0,.45),rgba(0,0,0,.1));opacity:.85;transition:.3s}
+.project-card.protected:hover .proj-thumb::after{opacity:.6}
+.pw-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:1rem;color:var(--muted);cursor:pointer}
+.pw-eye svg{display:block;position:absolute;inset:0;margin:auto;transition:opacity .2s ease, transform .2s ease}
+.eye-open{opacity:1}
+.eye-closed{opacity:0}
+.pw-eye.active .eye-open{opacity:0}
+.pw-eye.active .eye-closed{opacity:1}
+.pw-input-wrap{position:relative;display:flex;align-items:center}
+.pw-eye{position:absolute;right:30px;top:45%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+#pwInput{padding-right:2.2rem}
+.proj-lock{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border:1px solid rgba(123,111,205,.25);font-size:.75rem;padding:.25rem .5rem;border-radius:999px;box-shadow:0 5px 15px rgba(0,0,0,.1);z-index:2}
+.project-card.protected .proj-thumb::after{font-weight:300;text-transform:uppercase}
+.project-card.protected:hover{transform:translateY(-4px)}
+
+/* CURSOR */
+.cursor-dot{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;width:8px;height:8px;background:var(--purple);border-radius:50%;transform:translate(-50%,-50%);transition:transform .1s,background .2s}
+.cursor-ring{position:fixed;top:0;left:0;z-index:9998;pointer-events:none;width:36px;height:36px;border:1.5px solid var(--purple);border-radius:50%;transform:translate(-50%,-50%);transition:transform .35s cubic-bezier(.23,1,.32,1),width .3s,height .3s,border-color .3s;opacity:.6}
+body.chover .cursor-ring{width:60px;height:60px;border-color:var(--purple-deep);opacity:1}
+body.chover .cursor-dot{transform:translate(-50%,-50%) scale(2);background:var(--purple-deep)}
+
+/* PAGES */
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.5rem 4rem;transition:background .4s,backdrop-filter .4s,padding .4s}
+nav.scrolled{background:rgba(250,250,248,.9);backdrop-filter:blur(16px);padding:1rem 4rem;border-bottom:1px solid var(--border)}
+.nav-logo{font-weight:600;font-size:1.05rem;letter-spacing:.08em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.5rem;cursor:none}
+.nav-logo span{color:var(--purple)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-weight:300;font-size:.9rem;letter-spacing:.05em;color:var(--ink-mid);text-decoration:none;transition:color .2s;position:relative;cursor:none}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:100%;height:1px;background:var(--purple);transition:right .3s cubic-bezier(.23,1,.32,1)}
+.nav-links a:hover{color:var(--purple)}
+.nav-links a:hover::after{right:0}
+.nav-cta{font-family:'Kanit',sans-serif;font-weight:400;font-size:.85rem;letter-spacing:.08em;color:var(--purple-deep);background:transparent;border:1.5px solid var(--purple-mid);padding:.45rem 1.2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:background .3s,color .3s,border-color .3s}
+.nav-cta:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep)}
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px;cursor:none}
+.nav-burger span{display:block;width:24px;height:1.5px;background:var(--ink);transition:all .3s}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;inset:0;z-index:199;background:rgba(250,250,248,.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:2.5rem}
+.mobile-nav.open{display:flex}
+.mobile-nav a{font-size:2rem;font-weight:200;color:var(--ink);text-decoration:none;transition:color .2s;cursor:none}
+.mobile-nav a:hover{color:var(--purple)}
+.close-btn{position:absolute;top:1.5rem;right:4rem;font-size:1.5rem;background:none;border:none;color:var(--ink);cursor:none}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 4rem;position:relative;overflow:hidden;padding-top:100px;padding-bottom:5rem;background:var(--white);}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.blob1{width:520px;height:520px;background:var(--purple-light);opacity:.45;top:-100px;right:-80px;animation:bf1 9s ease-in-out infinite}
+.blob2{width:320px;height:320px;background:var(--cream);opacity:.6;bottom:60px;left:10%;animation:bf2 12s ease-in-out infinite}
+@keyframes bf1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.08)}}
+@keyframes bf2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-30px) scale(1.05)}}
+.hero-content{position:relative;z-index:1;max-width:820px}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:300;letter-spacing:.12em;color:var(--purple);background:var(--purple-light);border:1px solid var(--purple-mid);padding:.3rem .9rem;border-radius:2rem;margin-bottom:2rem;opacity:0;transform:translateY(20px);animation:fu .8s .2s cubic-bezier(.23,1,.32,1) forwards}
+.hero-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-name{font-size:clamp(3rem,8vw,7rem);font-weight:200;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-bottom:.3rem;opacity:0;transform:translateY(30px);animation:fu .9s .35s cubic-bezier(.23,1,.32,1) forwards}
+.hero-name em{font-style:italic;color:var(--purple)}
+.hero-role{font-size:clamp(3rem,8vw,7rem);font-weight:500;line-height:1.05;letter-spacing:-.02em;color:var(--ink);opacity:0;transform:translateY(30px);animation:fu .9s .45s cubic-bezier(.23,1,.32,1) forwards}
+.hero-desc{margin-top:2rem;font-size:1rem;font-weight:300;line-height:1.8;color:var(--muted);max-width:500px;opacity:0;transform:translateY(20px);animation:fu .8s .6s cubic-bezier(.23,1,.32,1) forwards}
+.hero-actions{display:flex;gap:1rem;margin-top:2.5rem;flex-wrap:wrap;opacity:0;transform:translateY(20px);animation:fu .8s .75s cubic-bezier(.23,1,.32,1) forwards}
+.btn-primary{font-family:'Kanit',sans-serif;font-weight:400;font-size:.9rem;letter-spacing:.06em;background:var(--purple-deep);color:var(--white);border:none;padding:.8rem 2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:transform .25s,box-shadow .25s;display:inline-block}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(74,63,160,.35)}
+.btn-secondary{font-family:'Kanit',sans-serif;font-weight:300;font-size:.9rem;letter-spacing:.06em;background:transparent;color:var(--ink-mid);border:1.5px solid var(--cream-mid);padding:.8rem 2rem;border-radius:2rem;cursor:none;text-decoration:none;transition:border-color .25s,color .25s;display:inline-block}
+.btn-secondary:hover{border-color:var(--purple-mid);color:var(--purple)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;font-size:.7rem;font-weight:300;letter-spacing:.15em;color:var(--muted);opacity:0;animation:fi 1s 1.2s forwards}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,transparent,var(--purple-mid));animation:sl 2s ease-in-out infinite}
+@keyframes sl{0%,100%{transform:scaleY(1);opacity:1}50%{transform:scaleY(.5);opacity:.4}}
+.hero-stats{position:absolute;right:4rem;bottom:5rem;display:flex;flex-direction:column;gap:2rem;opacity:0;animation:fu .8s .9s cubic-bezier(.23,1,.32,1) forwards}
+.stat{text-align:right}
+.stat-num{font-size:2rem;font-weight:500;color:var(--purple-deep);line-height:1}
+.stat-label{font-size:.7rem;font-weight:300;letter-spacing:.1em;color:var(--muted);margin-top:.2rem}
+@keyframes fu{to{opacity:1;transform:translateY(0)}}
+@keyframes fi{to{opacity:1}}
+
+/* MARQUEE */
+.marquee-wrap{padding:2rem 0;background:var(--cream);border-top:1px solid var(--cream-mid);border-bottom:1px solid var(--cream-mid);overflow:hidden}
+.marquee-track{display:flex;gap:3rem;width:max-content;animation:mq 28s linear infinite}
+.marquee-wrap:hover .marquee-track{animation-play-state:paused}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-item{display:flex;align-items:center;gap:.75rem;font-size:.8rem;font-weight:300;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+.mq-item span{color:var(--purple)}
+
+/* SECTION COMMON */
+section{padding:7rem 4rem}
+.sec-label{display:flex;align-items:center;gap:1rem;font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem}
+.sec-label::before{content:'';display:block;width:30px;height:1px;background:var(--purple-mid)}
+.sec-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:200;line-height:1.1;color:var(--ink);letter-spacing:-.02em}
+.sec-title strong{font-weight:500}
+.sec-title em{font-style:italic;color:var(--purple)}
+
+/* WORK */
+#work{background:var(--white)}
+.work-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4rem;flex-wrap:wrap;gap:1rem}
+.work-filter{display:flex;gap:.5rem;flex-wrap:wrap}
+.filter-btn{font-family:'Kanit',sans-serif;font-weight:300;font-size:.8rem;letter-spacing:.06em;background:transparent;color:var(--muted);border:1px solid var(--cream-mid);padding:.35rem 1rem;border-radius:2rem;cursor:none;transition:all .25s}
+.filter-btn.active,.filter-btn:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep)}
+.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}
+.project-card{border-radius:1rem;overflow:hidden;border:1px solid var(--cream-mid);background:var(--white);transition:transform .4s cubic-bezier(.23,1,.32,1),box-shadow .4s;cursor:none;text-decoration:none;color:inherit;display:block}
+.project-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(74,63,160,.12)}
+.project-card.featured{grid-column:span 2}
+.proj-thumb{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:var(--cream)}
+.proj-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.23,1,.32,1)}
+.project-card:hover .proj-thumb img{transform:scale(1.07)}
+.t1{background:linear-gradient(135deg,#DDD8F5,#C9C0F0)}
+.t2{background:linear-gradient(135deg,#E8E3D8,#D5CCB8)}
+.t3{background:linear-gradient(135deg,#F0EDE4,#E0DACB)}
+.t4{background:linear-gradient(135deg,#E8E3F5,#D0C8EC)}
+.t5{background:linear-gradient(135deg,#F5F0FA,#E5D8F5)}
+.t6{background:linear-gradient(135deg,#E8F5F0,#C8E8DC)}
+.t10{background:linear-gradient(135deg,#E0F0FF,#C8DCFF)}
+.proj-info{padding:1.5rem}
+.proj-cat{font-size:.72rem;font-weight:300;letter-spacing:.14em;color:var(--purple);margin-bottom:.5rem}
+.proj-title-card{font-size:1.15rem;font-weight:400;color:var(--ink);margin-bottom:.5rem}
+.proj-desc-short{font-size:.85rem;font-weight:300;color:var(--muted);line-height:1.7}
+.proj-tags-row{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+.proj-tag{font-size:.7rem;font-weight:300;letter-spacing:.05em;color:var(--muted);background:var(--cream);border-radius:1rem;padding:.2rem .7rem}
+.proj-cta-hint{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:400;color:var(--purple);margin-top:1rem;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .25s}
+.project-card:hover .proj-cta-hint{opacity:1;transform:translateX(0)}
+
+/*Logo*/
+.logo-img{height:50px;width:auto;display:block;}
+
+/* ── ABOUT SECTION (HOMEPAGE) ─────────────────── */
+#about-home{background:var(--cream)}
+.about-home-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;margin-top:4rem}
+.about-home-text p{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+.chip{font-size:.78rem;font-weight:300;letter-spacing:.06em;color:var(--purple-deep);background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:2rem;padding:.3rem .9rem;transition:background .2s,color .2s;cursor:default}
+.chip:hover{background:var(--purple-deep);color:var(--white)}
+.about-home-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2.5rem}
+.exp-list{background:var(--white);border-radius:1.5rem;padding:2.5rem;box-shadow:0 4px 24px rgba(74,63,160,.06)}
+.exp-list-label{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--muted);margin-bottom:1.5rem;display:flex;align-items:center;gap:.8rem}
+.exp-list-label::before{content:'';display:block;width:24px;height:1px;background:var(--purple-mid)}
+.exp-item{display:grid;grid-template-columns:130px 1fr;gap:1.5rem;padding:1.5rem 0;border-bottom:1px solid var(--cream-mid)}
+.exp-item:last-child{border-bottom:none}
+.exp-year{font-size:.78rem;font-weight:300;letter-spacing:.1em;color:var(--muted);padding-top:.15rem}
+.exp-role{font-size:1rem;font-weight:400;color:var(--ink);margin-bottom:.2rem}
+.exp-company{font-size:.85rem;font-weight:300;color:var(--purple)}
+.exp-desc{font-size:.83rem;font-weight:300;color:var(--muted);line-height:1.7;margin-top:.5rem}
+
+/* PROCESS */
+#process{background:var(--purple-deep)}
+#process .sec-label{color:var(--purple-mid)}
+#process .sec-label::before{background:var(--purple-mid)}
+#process .sec-title{color:var(--white)}
+#process .sec-title em{color:var(--purple-mid)}
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:4rem}
+.process-step{padding:2rem 1.5rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:1rem;transition:background .3s,transform .3s}
+.process-step:hover{background:rgba(255,255,255,.1);transform:translateY(-4px)}
+.step-num{font-size:3rem;font-weight:200;color:var(--purple-mid);line-height:1;margin-bottom:1.2rem;opacity:.5}
+.step-title{font-size:1.1rem;font-weight:400;color:var(--white);margin-bottom:.8rem}
+.step-desc{font-size:.85rem;font-weight:300;color:rgba(255,255,255,.5);line-height:1.7}
+
+/* CONTACT */
+#contact{background:var(--white)}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center;padding-top:2rem}
+.contact-inner .sec-label{justify-content:center}
+.contact-inner .sec-label::before{display:none}
+.contact-title{font-size:clamp(2.5rem,6vw,5rem);font-weight:200;line-height:1.1;margin-bottom:1.5rem;letter-spacing:-.02em}
+.contact-title em{font-style:italic;color:var(--purple)}
+.contact-desc{font-size:1rem;font-weight:300;color:var(--muted);line-height:1.8;margin-bottom:3rem}
+.contact-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.contact-link{font-family:'Kanit',sans-serif;font-weight:300;font-size:.85rem;letter-spacing:.08em;text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:2rem;border:1.5px solid var(--purple-mid);color:var(--purple-deep);transition:all .3s;cursor:none}
+.contact-link:hover{background:var(--purple-deep);color:var(--white);border-color:var(--purple-deep);transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:var(--ink);color:rgba(255,255,255,.4);padding:2.5rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.78rem;font-weight:300;letter-spacing:.06em}
+footer span{color:var(--purple-mid)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.23,1,.32,1),transform .9s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.rd1{transition-delay:.1s}.rd2{transition-delay:.2s}.rd3{transition-delay:.3s}.rd4{transition-delay:.4s}
+
+/* ── ABOUT PAGE (standalone) ─────────────────────────────── */
+#page-about{background:var(--white)}
+.about-page-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;padding:9rem 4rem 6rem}
+.about-page-wrap .exp-list{background:var(--cream);box-shadow:none}
+
+/* ── PROJECT DETAIL PAGE ─────────────────────── */
+#page-project{background:var(--white)}
+.proj-detail-wrap{padding-top:7rem}
+.back-link{display:inline-flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:300;letter-spacing:.08em;color:var(--muted);cursor:none;padding:2rem 4rem 0;transition:color .2s}
+.back-link:hover{color:var(--purple)}
+.proj-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;padding:3rem 4rem 4rem}
+.proj-cat-tag{font-size:.75rem;font-weight:300;letter-spacing:.18em;color:var(--purple);margin-bottom:1rem}
+.proj-big-title{font-size:clamp(2rem,5vw,3.8rem);font-weight:200;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin-bottom:1.5rem}
+.proj-big-title em{font-style:italic;color:var(--purple)}
+.proj-summary-text{font-size:1rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:2rem}
+.proj-meta-row{display:flex;gap:2rem;flex-wrap:wrap}
+.proj-meta-item .meta-label{font-size:.7rem;font-weight:300;letter-spacing:.14em;color:var(--muted);margin-bottom:.3rem}
+.proj-meta-item .meta-val{font-size:.9rem;font-weight:400;color:var(--ink)}
+.proj-cover-box{border-radius:1.2rem;overflow:hidden;aspect-ratio:16/10}
+.proj-cover-box img{width:100%;height:100%;object-fit:cover;display:block}
+.proj-sections{padding:0 4rem 5rem}
+.proj-section{margin-bottom:3.5rem}
+.proj-sec-title{font-size:1.3rem;font-weight:400;color:var(--ink);margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--cream-mid)}
+.proj-sec-body{font-size:.95rem;font-weight:300;line-height:2;color:var(--muted);white-space:pre-line}
+.outcomes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:1.5rem}
+.outcome-card{background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:.8rem;padding:1.3rem}
+.outcome-num{font-size:2rem;font-weight:500;color:var(--purple-deep);line-height:1}
+.outcome-label{font-size:.78rem;font-weight:300;color:var(--muted);margin-top:.4rem;letter-spacing:.06em}
+
+/* ── VIDEO EMBED GRID ─────────────────────── */
+.video-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;margin-top:1rem}
+.video-item
+.video-label{font-size:.78rem;font-weight:300;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem;text-transform:uppercase}
+.video-wrap{position:relative;width:100%;padding-bottom:56.25%;border-radius:1rem;overflow:hidden;background:var(--ink);box-shadow:0 8px 30px rgba(0,0,0,.12)}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+@media(min-width:768px){.video-grid{grid-template-columns:1fr 1fr}}
+.proj-gallery{margin:2rem 0}
+.proj-gallery-main{width:100%;border-radius:1rem;overflow:hidden;aspect-ratio:16/9;margin-bottom:1rem;background:var(--cream);cursor:pointer;position:relative}
+.proj-gallery-main img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.23,1,.32,1)}
+.proj-gallery-main:hover img{transform:scale(1.03)}
+.proj-gallery-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.proj-gallery-thumb{border-radius:.8rem;overflow:hidden;aspect-ratio:4/3;background:var(--cream);cursor:pointer;position:relative}
+.proj-gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.23,1,.32,1)}
+.proj-gallery-thumb:hover img{transform:scale(1.05)}
+.proj-gallery-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:300;color:var(--muted);letter-spacing:.08em}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.lightbox.open{opacity:1;pointer-events:auto}
+.lightbox-img{max-width:90vw;max-height:88vh;border-radius:.8rem;object-fit:contain;transform:scale(.95);transition:transform .3s cubic-bezier(.23,1,.32,1)}
+.lightbox.open .lightbox-img{transform:scale(1)}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;font-size:1.5rem;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.lightbox-close:hover{background:rgba(255,255,255,.25)}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;font-size:1.5rem;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.lightbox-nav:hover{background:rgba(255,255,255,.25)}
+.lightbox-prev{left:1.5rem}
+.lightbox-next{right:1.5rem}
+.lightbox-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:.8rem;font-weight:300;letter-spacing:.12em}
+
+.proj-img-mock{border-radius:1rem;overflow:hidden;aspect-ratio:16/9;margin:1.5rem 0}
+.proj-img-mock img{width:100%;height:100%;object-fit:cover;display:block}
+.proj-pagination{display:flex;justify-content:space-between;align-items:center;padding:2rem 4rem;border-top:1px solid var(--cream-mid);flex-wrap:wrap;gap:1rem}
+.page-link{font-family:'Kanit',sans-serif;font-weight:300;font-size:.85rem;letter-spacing:.08em;color:var(--purple-deep);cursor:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
+.page-link:hover{color:var(--purple)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav,nav.scrolled{padding:1.2rem 2rem}
+  #hero{padding:0 2rem}
+  .hero-stats{right:2rem}
+  section{padding:5rem 2rem}
+  .process-grid{grid-template-columns:repeat(2,1fr)}
+  footer{padding:2rem}
+  .proj-hero-grid{grid-template-columns:1fr;gap:2rem;padding:2rem}
+  .back-link{padding:2rem 2rem 0}
+  .proj-sections{padding:0 2rem 4rem}
+  .proj-pagination{padding:1.5rem 2rem}
+  .outcomes-grid{grid-template-columns:repeat(2,1fr)}
+  .about-page-wrap{grid-template-columns:1fr;padding:7rem 2rem 4rem}
+  .about-home-grid{grid-template-columns:1fr;gap:3rem}
+}
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .nav-burger{display:flex}
+  .hero-stats{display:none}
+  #hero{padding-bottom:0}
+  .projects-grid{grid-template-columns:1fr}
+  .project-card.featured{grid-column:span 1}
+  .process-grid{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr;gap:.4rem}
+  .outcomes-grid{grid-template-columns:1fr}
+  .about-home-grid{grid-template-columns:1fr}
+  body{cursor:auto}
+  .cursor-dot,.cursor-ring{display:none}
+  .proj-gallery-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">‹</button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="close-btn" onclick="closeMobile()">✕</button>
+  <a onclick="navGoTo('home','work')">Work</a>
+  <a onclick="navGoTo('home','about-home')">About</a>
+  <a onclick="navGoTo('home','process')">Process</a>
+  <a onclick="navGoTo('home','contact')">Contact</a>
+</div>
+
+<!-- Nav -->
+<nav id="mainNav">
+<a class="nav-logo" onclick="goTo('home')">
+  <img src="img/logo.png" alt="logo" class="logo-img">
+  <span>Portfolio</span>
+</a>
+  <ul class="nav-links">
+    <li><a onclick="navGoTo('home','work')">Work</a></li>
+    <li><a onclick="navGoTo('home','about-home')">About</a></li>
+    <li><a onclick="navGoTo('home','process')">Process</a></li>
+    <li><a onclick="navGoTo('home','contact')">Contact</a></li>
+  </ul>
+  <a href="mailto:kanokwan.premj@gmail.com" class="nav-cta">Hire me</a>
+  <button class="nav-burger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ═══════════════════ HOME ═══════════════════ -->
+<div id="page-home" class="page active">
+
+  <section id="hero">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="hero-content">
+      <div class="hero-tag">UX/UI Designer · Bangkok, TH</div>
+      <h1 class="hero-name"><em>Kanokwan</em> Premjit</h1>
+      <h2 class="hero-role">UX/UI Designer</h2>
+      <p class="hero-desc">Crafting meaningful digital experiences through deep user empathy and meticulous attention to every pixel.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" onclick="scrollToSection('work')">View Work →</a>
+        <a class="btn-secondary" onclick="scrollToSection('about-home')">About Me</a>
+      </div>
+    </div>
+    <div class="hero-scroll">SCROLL <div class="scroll-line"></div></div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
+      <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> Motion Design</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe Illustrator</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> HTML / CSS / JS</div>
+      <div class="mq-item"><span>✦</span> User Research</div><div class="mq-item"><span>✦</span> Wireframing</div>
+      <div class="mq-item"><span>✦</span> Prototyping</div><div class="mq-item"><span>✦</span> Figma</div>
+      <div class="mq-item"><span>✦</span> Design Systems</div><div class="mq-item"><span>✦</span> Motion Design</div>
+      <div class="mq-item"><span>✦</span> Usability Testing</div><div class="mq-item"><span>✦</span> Adobe Illustrator</div>
+      <div class="mq-item"><span>✦</span> Interaction Design</div><div class="mq-item"><span>✦</span> HTML / CSS / JS</div>
+    </div>
+  </div>
+
+  <section id="work">
+    <div class="work-header">
+      <div>
+        <div class="sec-label reveal">SELECTED WORK</div>
+        <div class="sec-title reveal" style="margin-top:.5rem">Featured <em>Projects</em></div>
+      </div>
+      <div class="work-filter reveal">
+        <button class="filter-btn active" onclick="filterProj('all',this)">All</button>
+        <button class="filter-btn" onclick="filterProj('uxui',this)">UX/UI</button>
+        <button class="filter-btn" onclick="filterProj('other',this)">Other Works</button>
+      </div>
+    </div>
+    <div class="projects-grid" id="projGrid">
+
+      <a class="project-card reveal" data-cat="uxui" onclick="openProj('automotive')">
+        <div class="proj-thumb t1">
+          <img src="img/locked.png" alt="Automotive Insurance Platform" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB APPLICATION · PROFESSIONAL PROJECT</div>
+          <div class="proj-title-card">Automotive Insurance Platform</div>
+          <div class="proj-desc-short">A web-based insurance platform for internal staff and dealers, replacing a 10-year-old legacy Windows system with intuitive, task-oriented workflows.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX Research</span><span class="proj-tag">UI Design</span><span class="proj-tag">Workflow Redesign</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="uxui" onclick="openProj('elearning')">
+        <div class="proj-thumb t10">
+          <img src="img/locked.png" alt="E-learning Platform" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB PLATFORM · PROFESSIONAL PROJECT</div>
+          <div class="proj-title-card">E-learning Platform</div>
+          <div class="proj-desc-short">An online learning platform designed to improve accessibility and engagement through structured courses, video learning, quizzes, and progress tracking.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX/UI Design</span><span class="proj-tag">Dashboard</span><span class="proj-tag">E-learning</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="uxui" onclick="openProj('bangkachao')">
+        <div class="proj-thumb t2">
+          <img src="img/DMS.png" alt="DMS Platform Bang Kachao" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">WEB PLATFORM · INTERNSHIP PROJECT</div>
+          <div class="proj-title-card">DMS Platform Bang Kachao</div>
+          <div class="proj-desc-short">A destination management website for the Bang Kachao community — showcasing local products, services, and attractions to stimulate tourism.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Web Design</span><span class="proj-tag">Responsive</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="uxui" onclick="openProj('arttherapy')">
+        <div class="proj-thumb t3">
+          <img src="img/arttherapy.png" alt="Art Therapy Interactive Website" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">INTERACTIVE WEB · SENIOR PROJECT</div>
+          <div class="proj-title-card">Art Therapy Interactive Website</div>
+          <div class="proj-desc-short">An immersive parallax website about art therapy with interactive activities — drawing, flower arrangement, painting, and expressive writing — for accessible mental wellbeing support.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Interaction Design</span><span class="proj-tag">HTML/CSS/JS</span><span class="proj-tag">Parallax</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="uxui" onclick="openProj('gaabgaab')">
+        <div class="proj-thumb t4">
+          <img src="img/gaabgaab.png" alt="Gaab Gaab App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · CLASS PROJECT</div>
+          <div class="proj-title-card">Gaab Gaab App</div>
+          <div class="proj-desc-short">An equipment borrowing and room reservation app for CMM students at KMUTT — featuring real-time availability, borrowing history, auto-fill, and multi-channel support.</div>
+          <div class="proj-tags-row"><span class="proj-tag">iOS Design</span><span class="proj-tag">User Flow</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="uxui" onclick="openProj('wibwab')">
+        <div class="proj-thumb t5">
+          <img src="img/wibwab.png" alt="Wibwab Accessories Web" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">E-COMMERCE · CLASS PROJECT</div>
+          <div class="proj-title-card">Wibwab Accessories Web</div>
+          <div class="proj-desc-short">An e-commerce website specialising in jewellery — earrings, rings, and necklaces — designed for a seamless shopping experience and curated product discovery.</div>
+          <div class="proj-tags-row"><span class="proj-tag">E-commerce UX</span><span class="proj-tag">Figma</span><span class="proj-tag">C# .NET</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal" data-cat="uxui" onclick="openProj('robinhood')">
+        <div class="proj-thumb t1">
+          <img src="img/robinhood.png" alt="Redesign Robinhood" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · REDESIGN · CLASS PROJECT</div>
+          <div class="proj-title-card">Redesign Robinhood</div>
+          <div class="proj-desc-short">UX redesign of the Robinhood food delivery app — fixing inaccurate location pinning, hidden delivery fees, missing reviews, and limited payment options.</div>
+          <div class="proj-tags-row"><span class="proj-tag">UX Redesign</span><span class="proj-tag">User Journey Map</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd1" data-cat="uxui" onclick="openProj('wash2go')">
+        <div class="proj-thumb t2">
+          <img src="img/wash2go.png" alt="Wash2Go Laundry App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · CLASS PROJECT</div>
+          <div class="proj-title-card">Wash2Go Laundry App</div>
+          <div class="proj-desc-short">A laundry management system for both customers and shop owners — with machine tracking, reservations, loyalty points, online payments, and real-time business reporting.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Service Design</span><span class="proj-tag">Mobile UX</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd2" data-cat="uxui" onclick="openProj('mamaloop')">
+        <div class="proj-thumb t6">
+          <img src="img/mamaloop.png" alt="MamaLoop App" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOBILE APP · SELF PROJECT</div>
+          <div class="proj-title-card">MamaLoop App</div>
+          <div class="proj-desc-short">A second-hand marketplace app dedicated to moms and kids — making it easy and safe to sell gently used baby items and find quality products at affordable prices.</div>
+          <div class="proj-tags-row"><span class="proj-tag">User Persona</span><span class="proj-tag">Marketplace UX</span><span class="proj-tag">Figma</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd3" data-cat="other" onclick="openProj('motion')">
+        <div class="proj-thumb t5">
+          <img src="img/motion.png" alt="Motion Graphics" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">MOTION GRAPHIC · CLASS & EXTRACURRICULAR</div>
+          <div class="proj-title-card">Motion Graphics Collection</div>
+          <div class="proj-desc-short">A collection of motion graphic works — including open house reels, fast fashion awareness video, student union loop animations, and live streaming motion for thesis exhibitions.</div>
+          <div class="proj-tags-row"><span class="proj-tag">After Effects</span><span class="proj-tag">Motion Design</span><span class="proj-tag">Animation</span></div>
+          <div class="proj-cta-hint">View Collection →</div>
+        </div>
+      </a>
+
+      <a class="project-card reveal rd4" data-cat="other" onclick="openProj('ohotokyo')">
+        <div class="proj-thumb t3">
+          <img src="img/ohotokyo.png" alt="Oho! Tokyo Branding" onerror="this.style.display='none'">
+        </div>
+        <div class="proj-info">
+          <div class="proj-cat">BRANDING · PART-TIME GRAPHIC DESIGNER</div>
+          <div class="proj-title-card">Oho! Tokyo Roll Pancake Shop</div>
+          <div class="proj-desc-short">Brand identity design for a roll pancake shop — logo, nametag, paper bag packaging, and full printed menu. Created during a part-time role at Overprint Shop.</div>
+          <div class="proj-tags-row"><span class="proj-tag">Logo Design</span><span class="proj-tag">Brand Identity</span><span class="proj-tag">Adobe Illustrator</span></div>
+          <div class="proj-cta-hint">View Case Study →</div>
+        </div>
+      </a>
+
+    </div>
+    <div style="text-align:center;margin-top:3rem" class="reveal">
+      <a class="btn-primary" onclick="goTo('allwork')" style="cursor:none;display:inline-block;justify-content:center">
+        See All Projects →
+      </a>
+    </div>
+  </section>
+
+  <!-- ABOUT ME (HOMEPAGE) -->
+  <section id="about-home">
+    <div class="sec-label reveal">ABOUT ME</div>
+    <div class="sec-title reveal" style="margin-top:.5rem">Designing with <em>Intention</em>,<br>Every Single Time</div>
+    <div class="about-home-grid">
+      <div class="about-home-text reveal">
+        <p>Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from King Mongkut's University of Technology Thonburi (KMUTT) with a Bachelor of Science in Applied Computer Science–Multimedia, achieving a GPAX of 3.83 (First Class Honours).</p>
+        <p>With experience spanning startups, internships, and a current full-time role at Tech Invent Co., Ltd., I specialise in designing UX/UI that balances aesthetics with real-world usability — from enterprise web platforms to consumer mobile apps.</p>
+        <p>When I'm not designing, you'll find me exploring motion graphics, editorial design trends, and refining my personal visual language.</p>
+        <div class="chips-wrap">
+          <span class="chip">Figma</span><span class="chip">Prototyping</span><span class="chip">User Research</span>
+          <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe Illustrator</span>
+          <span class="chip">Adobe Photoshop</span><span class="chip">After Effects</span><span class="chip">HTML/CSS/JS</span>
+        </div>
+        <div class="about-home-actions">
+          <a href="mailto:kanokwan.premj@gmail.com" class="btn-primary">Say Hello →</a>
+        </div>
+      </div>
+      <div class="exp-list reveal rd1">
+        <div class="exp-list-label">EXPERIENCE</div>
+        <div class="exp-item">
+          <div class="exp-year">Jul 2025 – Now</div>
+          <div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Feb – Apr 2025</div>
+          <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">Botnoi Group Co., Ltd.</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products. Participated in the Botnoi Hackathon Sales Material 2025.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Jun – Aug 2024</div>
+          <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">LearnDo Co., Ltd.</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Jun 2023 – Jun 2024</div>
+          <div><div class="exp-role">Public Relations Team Member</div><div class="exp-company">Student Union of FIET, KMUTT</div><div class="exp-desc">Designed event posters and visual communication materials posted on Instagram and Facebook (@smofiet).</div></div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-year">Oct – Dec 2022</div>
+          <div><div class="exp-role">Graphic Designer (Part-time)</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral including logo, nametag, and menu for client projects.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="sec-label reveal">HOW I WORK</div>
+    <div class="sec-title reveal" style="margin-top:.5rem;color:var(--white)">A Process Built on<br><em>Care</em> &amp; <strong>Curiosity</strong></div>
+    <div class="process-grid">
+      <div class="process-step reveal"><div class="step-num">01</div><div class="step-title">Research &amp; Discover</div><div class="step-desc">Understand users, problems, and business context through interviews, surveys, and competitive analysis.</div></div>
+      <div class="process-step reveal rd1"><div class="step-num">02</div><div class="step-title">Define &amp; Ideate</div><div class="step-desc">Shape problem statements, build user journeys, and ideate solutions with structured creative thinking.</div></div>
+      <div class="process-step reveal rd2"><div class="step-num">03</div><div class="step-title">Design &amp; Prototype</div><div class="step-desc">Create wireframes, high-fidelity visuals, and interactive prototypes that communicate the real experience.</div></div>
+      <div class="process-step reveal rd3"><div class="step-num">04</div><div class="step-title">Test &amp; Iterate</div><div class="step-desc">Test with real users, analyse findings, and iterate — repeating until the experience feels just right.</div></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="sec-label reveal">GET IN TOUCH</div>
+      <h2 class="contact-title reveal">Let's Build Something <em>Great</em> Together</h2>
+      <p class="contact-desc reveal">Interested in collaborating, have an exciting project, or just want to chat about design? I'd love to hear from you. ✦</p>
+      <div class="contact-links reveal">
+        <a href="mailto:kanokwan.premj@gmail.com" class="contact-link">📧 Email</a>
+        <a href="https://linkedin.com/in/kanokwan-premjit" class="contact-link" target="_blank">💼 LinkedIn</a>
+        <a href="https://behance.net/kanokwanpremjit" class="contact-link" target="_blank">🎨 Behance</a>
+      </div>
+    </div>
+  </section>
+
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<!-- ═══════════════════ ABOUT PAGE ═══════════════════ -->
+<div id="page-about" class="page">
+  <div class="about-page-wrap">
+    <div>
+      <div class="sec-label">ABOUT ME</div>
+      <div class="sec-title" style="margin-bottom:1.5rem">Designing with <em>Intention</em>,<br>Every Single Time</div>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">Hi, I'm Chompoo — a UX/UI Designer based in Bangkok, Thailand. I graduated from King Mongkut's University of Technology Thonburi (KMUTT) with a Bachelor of Science in Applied Computer Science–Multimedia, achieving a GPAX of 3.83 (First Class Honours).</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted);margin-bottom:1.1rem">With experience spanning startups, internships, and a current full-time role at Tech Invent Co., Ltd., I specialise in designing UX/UI that balances aesthetics with real-world usability — from enterprise web platforms to consumer mobile apps.</p>
+      <p style="font-size:.95rem;font-weight:300;line-height:1.9;color:var(--muted)">When I'm not designing, you'll find me exploring motion graphics, editorial design trends, and refining my personal visual language.</p>
+      <div class="chips-wrap">
+        <span class="chip">Figma</span><span class="chip">Prototyping</span><span class="chip">User Research</span>
+        <span class="chip">Design Systems</span><span class="chip">Wireframing</span><span class="chip">Adobe Illustrator</span>
+        <span class="chip">Adobe Photoshop</span><span class="chip">After Effects</span><span class="chip">HTML/CSS/JS</span>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2.5rem">
+        <a href="mailto:kanokwan.premj@gmail.com" class="btn-primary">Say Hello →</a>
+        <a class="btn-secondary" onclick="goTo('home')">← Back to Home</a>
+      </div>
+    </div>
+    <div class="exp-list">
+      <div class="exp-list-label">EXPERIENCE</div>
+      <div class="exp-item">
+        <div class="exp-year">Jul 2025 – Now</div>
+        <div><div class="exp-role">UX/UI Designer</div><div class="exp-company">Tech Invent Co., Ltd.</div><div class="exp-desc">Leading UX/UI design for enterprise and consumer-facing digital products.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Feb – Apr 2025</div>
+        <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">Botnoi Group Co., Ltd.</div><div class="exp-desc">Designed conversational UI and dashboard experiences for AI-powered products. Participated in the Botnoi Hackathon Sales Material 2025.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Jun – Aug 2024</div>
+        <div><div class="exp-role">UX/UI Designer (Internship)</div><div class="exp-company">LearnDo Co., Ltd.</div><div class="exp-desc">Built design systems and educational product interfaces for e-learning platforms.</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Jun 2023 – Jun 2024</div>
+        <div><div class="exp-role">Public Relations Team Member</div><div class="exp-company">Student Union of FIET, KMUTT</div><div class="exp-desc">Designed event posters and visual communication materials posted on Instagram and Facebook (@smofiet).</div></div>
+      </div>
+      <div class="exp-item">
+        <div class="exp-year">Oct – Dec 2022</div>
+        <div><div class="exp-role">Graphic Designer (Part-time)</div><div class="exp-company">Overprint Shop</div><div class="exp-desc">Created brand collateral including logo, nametag, and menu for client projects.</div></div>
+      </div>
+    </div>
+  </div>
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<!-- ═══════════════════ ALL WORK PAGE ═══════════════════ -->
+<div id="page-allwork" class="page" style="background:var(--white)">
+  <section style="padding-top:8rem;background:var(--white)">
+    <div class="work-header">
+      <div>
+        <div class="sec-label">ALL PROJECTS</div>
+        <div class="sec-title" style="margin-top:.5rem">All <em>Works</em></div>
+      </div>
+      <div class="work-filter">
+        <button class="filter-btn active" onclick="filterAll('all',this)">All</button>
+        <button class="filter-btn" onclick="filterAll('uxui',this)">UX/UI</button>
+        <button class="filter-btn" onclick="filterAll('other',this)">Other Works</button>
+      </div>
+    </div>
+    <div class="projects-grid" id="allProjGrid">
+      <a class="project-card" data-type="uxui" onclick="openProj('automotive')">
+        <div class="proj-thumb"><img src="img/locked.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Web App</div><div class="proj-title-card">Automotive Insurance Platform</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('elearning')">
+        <div class="proj-thumb"><img src="img/locked.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Web Platform</div><div class="proj-title-card">E-learning Platform</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('bangkachao')">
+        <div class="proj-thumb"><img src="img/DMS.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Web</div><div class="proj-title-card">DMS Platform Bang Kachao</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('arttherapy')">
+        <div class="proj-thumb"><img src="img/arttherapy.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Interactive</div><div class="proj-title-card">Art Therapy Website</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('gaabgaab')">
+        <div class="proj-thumb"><img src="img/gaabgaab.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Mobile</div><div class="proj-title-card">Gaab Gaab App</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('wibwab')">
+        <div class="proj-thumb"><img src="img/wibwab.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · E-commerce</div><div class="proj-title-card">Wibwab Accessories</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('robinhood')">
+        <div class="proj-thumb"><img src="img/robinhood.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Redesign</div><div class="proj-title-card">Robinhood Redesign</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('wash2go')">
+        <div class="proj-thumb"><img src="img/wash2go.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Service</div><div class="proj-title-card">Wash2Go App</div></div>
+      </a>
+      <a class="project-card" data-type="uxui" onclick="openProj('mamaloop')">
+        <div class="proj-thumb"><img src="img/mamaloop.png"></div>
+        <div class="proj-info"><div class="proj-cat">UX/UI · Marketplace</div><div class="proj-title-card">MamaLoop App</div></div>
+      </a>
+      <a class="project-card" data-type="other" onclick="openProj('ohotokyo')">
+        <div class="proj-thumb"><img src="img/ohotokyo.png"></div>
+        <div class="proj-info"><div class="proj-cat">Branding · Logo</div><div class="proj-title-card">Oho! Tokyo Branding</div></div>
+      </a>
+      <a class="project-card" data-type="other" onclick="openProj('motion')">
+        <div class="proj-thumb t5"><img src="img/motion.png" onerror="this.style.display='none'"></div>
+        <div class="proj-info"><div class="proj-cat">Motion · Animation</div><div class="proj-title-card">Motion Graphics Collection</div></div>
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <a class="btn-secondary" onclick="goTo('home')">← Back to Home</a>
+    </div>
+  </section>
+  <footer><span>© 2025 Kanokwan Premjit</span></footer>
+</div>
+
+<!-- ═══════════════════ PROJECT DETAIL ═══════════════════ -->
+<div id="page-project" class="page">
+  <div class="proj-detail-wrap">
+    <div class="back-link" onclick="navGoTo('home','work')">← Back to Work</div>
+    <div class="proj-hero-grid" id="pdHero"></div>
+    <div class="proj-sections" id="pdBody"></div>
+    <div class="proj-pagination" id="pdNav"></div>
+  </div>
+  <footer><span>© 2025 Kanokwan Premjit</span><div>Designed with <span>♡</span> in Bangkok</div></footer>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   PROJECT DATA  —  sections[] ตรงกับ PDF portfolio
+   ══════════════════════════════════════════════════════ */
+const PD = {
+
+  /* ─── 01 · AUTOMOTIVE INSURANCE ──────────────────── */
+  automotive: {
+    id: 'automotive', img:null, tc: 't1',
+    gallery: null,
+    cat: 'WEB APPLICATION · PROFESSIONAL PROJECT (CONFIDENTIAL CLIENT)',
+    title: 'Automotive Insurance Platform',
+    summary: 'Redesigning an internal web-based platform used by operational staff and dealers. The legacy system had been in use for over 10 years, resulting in outdated UX patterns and inefficiencies in daily workflows. Due to NDA restrictions, some details such as UI screens, data, and business logic have been modified or generalised.',
+    role: 'UX/UI Designer',
+    duration: 'Professional Project · Tech Invent Co., Ltd.',
+    tools: 'Figma',
+    sections: [
+      {
+        title: 'Problem',
+        body: `· Legacy system created major usability issues, especially for new employees
+· Complex and unintuitive workflows slowed down daily operations
+· Heavy reliance on long, form-based data input
+· Difficult onboarding process for new staff
+· No centralised dashboard for role-based visibility
+· Misalignment between system design and real-world workflows`
+      },
+      {
+        title: 'Process',
+        body: `1. Requirement Gathering
+   · Collaborated with stakeholders to understand business goals and system constraints
+   · Reviewed existing system and operational workflows
+   · Defined key requirements for internal staff and dealers
+
+2. Stakeholder & User Interviews
+   · Interviewed internal staff and dealers
+   · Identified pain points in daily operations
+   · Captured real usage behaviours and expectations
+
+3. Workflow Analysis
+   · Mapped current (as-is) workflows
+   · Identified redundant steps and friction points
+   · Highlighted inefficiencies in task completion
+
+4. Problem Framing
+   · Grouped issues into: Usability, Structure, and Visibility
+   · Prioritised problems based on impact and feasibility
+
+5. Design Iteration
+   · Translated insights into design solutions
+   · Created wireframes → UI interfaces
+   · Validated flows with users and refined based on feedback
+
+Key Insight
+The main issue was not user capability, but a mismatch between the system design and actual user workflows.`
+      },
+      {
+        title: 'Solutions',
+        body: `· Redesigned workflows to be task-oriented and intuitive
+· Simplified forms and reduced unnecessary fields
+· Introduced a dashboard for better data visibility
+· Improved navigation structure for faster access
+· Designed for both new users (learnability) and existing users (efficiency)`
+      },
+      {
+        title: 'Impact',
+        body: `· Improved onboarding experience for new employees
+· Reduced confusion in daily operations
+· Faster access to key information
+· Better alignment with real user workflows
+· Increased overall usability and task completion efficiency`
+      }
+    ],
+    outcomes: [
+      { n: '✓', l: 'Simplified Workflows' },
+      { n: '✓', l: 'Role-based Dashboard' },
+      { n: '✓', l: 'Faster Onboarding' }
+    ],
+    tags: ['UX Research', 'UI Design', 'Workflow Redesign', 'Figma'],
+    prev: 'ohotokyo', next: 'elearning'
+  },
+
+  /* ─── 02 · E-LEARNING PLATFORM ───────────────────── */
+  elearning: {
+    id: 'elearning', img: null, tc: 't10',
+    gallery: null,
+    cat: 'WEB PLATFORM · PROFESSIONAL PROJECT (CONFIDENTIAL CLIENT)',
+    title: 'E-learning Platform',
+    summary: 'Designing an inclusive learning platform that enables users to access education anytime, anywhere — as long as they have an internet connection. The goal was to create a system that supports equal access to education, while empowering both learners and educators with tools to effectively engage, manage, and track learning progress.',
+    role: 'UX/UI Designer',
+    duration: 'Professional Project · Tech Invent Co., Ltd.',
+    tools: 'Figma',
+    sections: [
+      {
+        title: 'Problem',
+        body: `· The platform supported anytime, anywhere learning, but lacked tools to track and evaluate learning outcomes
+· No dashboard for monitoring learner progress, course performance, or engagement
+· Limited visibility of learning data for both learners and educators
+· Learning content and assessments were not diverse enough, reducing engagement
+· Lack of structured feedback to support continuous improvement
+
+Key Insight
+Accessibility alone is not enough — users need visibility, feedback, and motivation to truly learn effectively. A successful learning platform must support both learning experience (for learners) and teaching & monitoring tools (for educators).`
+      },
+      {
+        title: 'Goals',
+        body: `· Enable equal access to learning anytime, anywhere
+· Improve visibility of learning progress and outcomes
+· Increase engagement through interactive content and gamification
+· Support educators with tools for teaching management and performance tracking`
+      },
+      {
+        title: 'Process',
+        body: `1. Requirement Gathering
+   · Collaborated with stakeholders to understand business goals and constraints
+   · Reviewed existing system capabilities and limitations
+   · Defined key requirements for both learners and educators
+
+2. Problem Analysis
+   · Analysed current user flows and identified pain points
+   · Mapped gaps in learning visibility, engagement, and content structure
+
+3. User & Workflow Understanding
+   · Identified key user groups: learners and educators
+   · Studied real usage patterns and learning behaviours
+
+4. Solution Design
+   · Translated requirements into UX solutions
+   · Designed information architecture and user flows
+   · Created wireframes and interaction concepts
+
+5. Validation & Iteration
+   · Reviewed designs with stakeholders
+   · Iterated based on feedback and feasibility
+   · Refined UI for clarity and usability`
+      },
+      {
+        title: 'Solutions',
+        body: `1. Learning Dashboard & Analytics — track progress, course completion, performance insights
+2. Structured Learning Experience — organised learning paths, self-paced navigation
+3. Diverse Content & Assessments — interactive lessons, multiple quiz types
+4. Gamification System — progress tracking, rewards/achievements
+5. Educator Tools — manage courses, track learner performance, monitor class progress`
+      },
+      {
+        title: 'Impact',
+        body: `· Improved visibility of learning progress and outcomes
+· Increased learner engagement through interactive and gamified experiences
+· Enabled educators to manage and evaluate learning more effectively
+· Supported continuous and self-paced learning
+· Bridged the gap between learning activity and measurable results`
+      }
+    ],
+    outcomes: [
+      { n: '✓', l: 'Learning Dashboard' },
+      { n: '✓', l: 'Progress Tracking' },
+      { n: '✓', l: 'Educator Tools' }
+    ],
+    tags: ['UX/UI Design', 'Dashboard', 'E-learning', 'Figma'],
+    prev: 'automotive', next: 'bangkachao'
+  },
+
+  /* ─── 03 · DMS PLATFORM BANG KACHAO ──────────────── */
+  bangkachao: {
+    id: 'bangkachao', img: 'img/DMS.png', tc: 't2',
+    gallery: ['img/DMS_1.png', 'img/DMS_2.png'],
+    cat: 'WEB PLATFORM · INTERNSHIP PROJECT',
+    title: 'DMS Platform Bang Kachao',
+    summary: 'A destination management website designed to help improve the quality of life for people in the Bang Kachao area — by bringing local products and services online and stimulating tourist interest. Designed in both mobile and desktop versions.',
+    role: 'UX/UI Designer',
+    duration: 'Internship · LearnDo Co., Ltd. (Jun – Aug 2024)',
+    tools: 'Figma',
+    link: [
+      { label: 'Prototype Mobile ↗', url: 'https://www.figma.com/proto/PR713cN4HyiSGbvDxg7K71/DMS-mobile?t=xvGIuGv2vC1ld1jQ-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&node-id=2-11244&starting-point-node-id=104%3A3033' },
+      { label: 'Prototype Desktop ↗', url: 'https://www.figma.com/proto/fxZbp80VtMnypWrFP96Q7Q/DMS-desktop-(Copy)?node-id=2249-16384&t=5XEu8Vtdx6a4uTFg-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=197%3A2285' }
+    ],
+    sections: [
+      {
+        title: 'About the Project',
+        body: `Design a website that will help improve the quality of life of people in the Bang Kachao area. By bringing the products and services of people in the area to develop further and stimulate the interest of tourists.
+
+Colour Palette: #10443e · #32745c · #67a49c · #ede4d7`
+      },
+      {
+        title: 'Outcome',
+        body: `· A platform that brings together local products and services in one accessible place
+· Helps community members reach a wider audience beyond local channels
+· Makes it easier for tourists to discover what Bang Kachao has to offer
+· Delivered in 2 platform versions: Mobile & Desktop`
+      }
+    ],
+    outcomes: [
+      { n: '2', l: 'Platform Versions' },
+      { n: '✓', l: 'Community Marketplace' },
+      { n: '✓', l: 'Tourism Content Hub' }
+    ],
+    tags: ['Web Design', 'Responsive Design', 'Community UX', 'Figma'],
+    prev: 'elearning', next: 'arttherapy'
+  },
+
+  /* ─── 04 · ART THERAPY WEBSITE ───────────────────── */
+  arttherapy: {
+    id: 'arttherapy', img: 'img/arttherapy.png', tc: 't3',
+    gallery: ['img/arttherapy_1.png'],
+    cat: 'INTERACTIVE WEB · SENIOR PROJECT',
+    title: 'The Interactive Website About Art Therapy',
+    summary: 'An interactive parallax website providing knowledge about art therapy — a method for reducing stress through creative simulation activities. Includes trial activities related to art therapy such as drawing, flower arrangement, painting, and expressive writing. The goal is to cater to the modern lifestyle that demands convenience and easy access to information without the need to travel to a physical location.',
+    role: 'UX/UI & Interaction Designer',
+    duration: 'Senior Project · KMUTT',
+    tools: 'Figma, HTML, CSS, JavaScript',
+    link: [
+      { label: 'Live Website ↗', url: 'https://kmutt.me/RABYE-ART' }
+    ],
+    sections: [
+      {
+        title: 'About the Project',
+        body: `This project focuses on developing an interactive website that provides knowledge about art therapy — a method for reducing stress through various creative simulation activities, presented in a parallax format. It includes trial activities related to art therapy, such as drawing, flower arrangement, painting, and expressive writing.
+
+The goal is to cater to the modern lifestyle that demands convenience and easy access to information without the need to travel to a physical location. The website is designed for those interested in studying art therapy by compiling essential content such as its definition and benefits. It not only delivers academic knowledge but also serves as a space where users can freely express their thoughts and emotions.
+
+Colour Palette: #f7e9dc · #97c7eb · #5aa2ca · #328d61 · #f195bc · #f5793b`
+      },
+      {
+        title: 'Outcome',
+        body: `· A live, publicly accessible website at kmutt.me/RABYE-ART
+· Delivers both educational content about art therapy and hands-on interactive activities
+· Users can freely express thoughts and emotions through creative exercises
+· Achieved the goal of making art therapy knowledge easy and enjoyable to access`
+      }
+    ],
+    outcomes: [
+      { n: '4', l: 'Interactive Activity Types' },
+      { n: '✓', l: 'Parallax Experience' },
+      { n: '✓', l: 'Publicly Accessible' }
+    ],
+    tags: ['Interaction Design', 'HTML/CSS/JS', 'Parallax', 'Mental Health UX'],
+    prev: 'bangkachao', next: 'gaabgaab'
+  },
+
+  /* ─── 05 · GAAB GAAB APP ─────────────────────────── */
+  gaabgaab: {
+    id: 'gaabgaab', img: 'img/gaabgaab.png', tc: 't4',
+    gallery: ['img/gaabgaab_1.png', 'img/gaabgaab_2.png'],
+    cat: 'MOBILE APP · CLASS PROJECT',
+    title: 'Gaab Gaab App',
+    summary: 'An application designed for borrowing equipment and reserving rooms — facilitating various tasks for students in the Applied Computer Science–Multimedia (CMM) program at KMUTT. Developed to enhance convenience and usability, the app streamlines the process of booking and returning equipment or classrooms. Users can easily check real-time availability, borrowing status, and queue position.',
+    role: 'UX/UI Designer',
+    duration: 'Class Project · KMUTT',
+    tools: 'Figma',
+    link: [
+      { label: 'View Prototype ↗', url: 'https://www.figma.com/proto/5PWPIfJHQSIUamZO7PTlr0/Final_CMM223-(-G.3-)?node-id=9-3&starting-point-node-id=9%3A3&t=Fsg4IrUj1Qu6fXH3-1' }
+    ],
+    sections: [
+      {
+        title: 'Problem',
+        body: `· Cannot see the item image before borrowing — the form only shows the name
+· For frequent borrowers, the form requires re-entering the same details repeatedly
+· The form is too detailed, making it hard to find items quickly
+· The only way to contact staff is by phone — no alternative channels`
+      },
+      {
+        title: 'Solution',
+        body: `· Display equipment and room images before borrowing
+· Add a search function to find equipment by name
+· Provide multiple contact channels (e.g., in-app chat)
+· Enable auto-fill for previously entered information
+· Show borrowing history for equipment and rooms
+· Send reminders for return dates or room usage`
+      },
+      {
+        title: 'User Flow',
+        body: `Start → Home → Select room or equipment → Check availability → Fill in information → Confirm
+
+Colour Palette: #67dcbf · #baecdf · #f3cd4e · #7ea9c0`
+      }
+    ],
+    outcomes: [
+      { n: '✓', l: 'Real-time Availability' },
+      { n: '✓', l: 'Auto-fill & History' },
+      { n: '✓', l: 'Multi-channel Support' }
+    ],
+    tags: ['iOS Design', 'User Flow', 'Figma', 'Student UX'],
+    prev: 'arttherapy', next: 'wibwab'
+  },
+
+  /* ─── 06 · WIBWAB ACCESSORIES WEB ────────────────── */
+  wibwab: {
+    id: 'wibwab', img: 'img/wibwab.png', tc: 't5',
+    gallery: ['img/wibwab_1.png'],
+    cat: 'E-COMMERCE · CLASS PROJECT',
+    title: 'Wibwab Accessories Web',
+    summary: 'Wibwab Accessories is an e-commerce website specialising in jewellery — with a primary focus on earrings, rings, and necklaces. The platform is designed to provide customers with a seamless shopping experience, offering a curated collection of stylish, high-quality accessories to suit various tastes and occasions.',
+    role: 'UX/UI Designer & Developer',
+    duration: 'Class Project · KMUTT',
+    tools: 'Figma, C# .NET',
+    sections: [
+      {
+        title: 'About the Project',
+        body: `Wibwab Accessories is an e-commerce website specialising in jewellery, with a primary focus on earrings, rings, and necklaces. The platform is designed to provide customers with a seamless shopping experience, offering a curated collection of stylish and high-quality accessories to suit various tastes and occasions.`
+      },
+      {
+        title: 'Solution',
+        body: `· Designed in Figma: home, product listings by category (earrings / rings / necklaces), product detail pages, cart, and checkout
+· Implemented with C# .NET as a functional web application
+· Key screens: New Collection homepage, category browsing, product detail with size/colour options, cart summary, and multi-payment checkout (bank transfer, mobile banking, credit card)
+· Added promotional features: exclusive new customer discount, sale banners`
+      },
+      {
+        title: 'Outcome',
+        body: `· A complete, functional e-commerce UI with a clean, premium aesthetic suited to an accessories brand
+· Covers the full shopping journey from discovery to checkout
+· Multiple payment options including Mobile Banking, PromptPay, and credit card`
+      }
+    ],
+    outcomes: [
+      { n: '✓', l: 'Full Shopping Journey' },
+      { n: '✓', l: 'Category Navigation' },
+      { n: '✓', l: 'Multi-payment Checkout' }
+    ],
+    tags: ['E-commerce UX', 'Visual Design', 'Figma', 'C# .NET'],
+    prev: 'gaabgaab', next: 'robinhood'
+  },
+
+  /* ─── 07 · REDESIGN ROBINHOOD ────────────────────── */
+  robinhood: {
+    id: 'robinhood', img: 'img/robinhood.png', tc: 't1',
+    gallery: ['img/robinhood_1.png', 'img/robinhood_2.png'],
+    cat: 'MOBILE APP · REDESIGN · CLASS PROJECT',
+    title: 'Redesign Robinhood',
+    summary: 'A UX redesign of the Robinhood Thailand food delivery app, addressing key usability pain points identified through User Journey Mapping. Focused on improving location accuracy, fee transparency, review visibility, homepage layout, and payment options.',
+    role: 'UX Researcher & UI Designer',
+    duration: 'Class Project · KMUTT',
+    tools: 'Figma',
+    link: [
+      { label: 'View Prototype ↗', url: 'https://www.figma.com/proto/Aw0ygBIOiT3ydCHytHutlx?node-id=0-1&t=b9clPgHpSKuhpVuA-6' }
+    ],
+    sections: [
+      {
+        title: 'Problem',
+        body: `· The pinned location is inaccurate
+· The delivery fee is not shown until you proceed to place an order
+· Unable to view product and shop reviews
+· The recommended shop section is placed too far from the product list, causing users to overlook it
+· Only two banks are available for Mobile Banking payments`
+      },
+      {
+        title: 'Solution',
+        body: `· Pin the location more precisely
+· Display delivery fee on the restaurant's main page
+· Show product and shop reviews
+· Adjust the layout of the homepage to make recommended shops more visible
+· Add more bank options for Mobile Banking`
+      },
+      {
+        title: 'User Journey Map',
+        body: `Persona: Miss Nuttanit — Female, 20 years old, University student
+Scenario: Wants to eat Mala food
+Goal: Find a restaurant, pay via mobile banking, total cost under 100 baht including delivery
+
+Journey stages: Need & Want → Doing/Action → Problem/Pain Point → Opportunities/Solution
+Actions traced: Open app → Tap food category → Search for Mala → Select product → Add to cart → Look for promotions → Confirm order → Pay via bank → Close app`
+      }
+    ],
+    outcomes: [
+      { n: '5', l: 'Pain Points Resolved' },
+      { n: '✓', l: 'Journey Map Driven' },
+      { n: '✓', l: 'Prototype Available' }
+    ],
+    tags: ['UX Redesign', 'User Journey Map', 'Heuristic Evaluation', 'Figma'],
+    prev: 'wibwab', next: 'wash2go'
+  },
+
+  /* ─── 08 · WASH2GO LAUNDRY APP ───────────────────── */
+  wash2go: {
+    id: 'wash2go', img: 'img/wash2go.png', tc: 't2',
+    gallery: ['img/wash2go_2.png', 'img/wash2go_1.png'],
+    cat: 'MOBILE APP · CLASS PROJECT',
+    title: 'Wash2Go Laundry App',
+    summary: 'Wash2Go is a system designed to manage various tasks within a laundry shop — enhancing convenience and efficiency for both customers and business owners. The app addresses machine availability, payment limitations, timing uncertainty, and operational visibility through a dual-interface mobile platform.',
+    role: 'UX/UI Designer',
+    duration: 'Class Project · KMUTT',
+    tools: 'Figma',
+    link: [
+      { label: 'Prototype Customer ↗', url: 'https://www.figma.com/proto/tisDN8LhWhsG4RYAqvvSwp/MIS?node-id=2313-4&starting-point-node-id=2313%3A2&show-proto-sidebar=1' },
+      { label: 'Prototype Owner ↗', url: 'https://www.figma.com/proto/tisDN8LhWhsG4RYAqvvSwp/MIS?node-id=2500-350&starting-point-node-id=2521%3A141&show-proto-sidebar=1' }
+    ],
+    sections: [
+      {
+        title: 'Problem',
+        body: `Customers
+· Washing machines are often full
+· The payment system does not support bank transfers
+· Uncertain about the exact time machines will be available
+· Don't know where to ask questions or raise concerns
+
+Business Owners
+· Cannot view daily reports remotely
+· Have to travel to each branch to check on operations
+· Hard to plan maintenance schedules`
+      },
+      {
+        title: 'Solution',
+        body: `Customer App
+· Available Machine Tracking — real-time machine status
+· Washing Machine Reservation System — book machines in advance
+· Loyalty Points — earn rewards with each wash
+· Support Online Payments — bank transfer, QR code, etc.
+· Automated Notifications & Support Bot — get answers and alerts instantly
+
+Business Owner Dashboard
+· Real-time Business Reporting — daily revenue and usage data
+· Data Analytics — trends and performance insights
+· Monitor Machine Usage Frequency — track which machines need maintenance`
+      },
+      {
+        title: 'Outcome',
+        body: `· A comprehensive dual-sided platform that makes laundry management frictionless
+· Business owners gain full operational visibility without needing to be on-site
+· 8 core feature solutions covering both customer and owner needs`
+      }
+    ],
+    outcomes: [
+      { n: '2', l: 'User Sides (Customer & Owner)' },
+      { n: '8', l: 'Core Feature Solutions' },
+      { n: '✓', l: 'Real-time Reporting' }
+    ],
+    tags: ['Service Design', 'Mobile UX', 'Dual Interface', 'Figma'],
+    prev: 'robinhood', next: 'mamaloop'
+  },
+
+  /* ─── 09 · MAMALOOP APP ──────────────────────────── */
+  mamaloop: {
+    id: 'mamaloop', img: 'img/mamaloop.png', tc: 't6',
+    gallery: ['img/mamaloop_1.png', 'img/mamaloop_2.png'],
+    cat: 'MOBILE APP · SELF PROJECT',
+    title: 'MamaLoop App',
+    summary: 'MamaLoop is an application designed as a second-hand marketplace specifically for mothers and children. Its goal is to enable moms to sell gently used baby items and pass them on to other mothers who are looking for quality products at affordable prices.',
+    role: 'UX/UI Designer',
+    duration: 'Self Project',
+    tools: 'Figma',
+    sections: [
+      {
+        title: 'About the Project',
+        body: `MamaLoop is an application designed as a second-hand marketplace specifically for mothers and children. Its goal is to enable moms to sell gently used baby items and pass them on to other mothers who are looking for quality products at affordable prices.
+
+Colour Palette: #f3ebe3 · #d1b89f · #735240 · #e3edf2 · #7ea9c0`
+      },
+      {
+        title: 'User Persona',
+        body: `Seller — Mei
+· Freelancer, 32 years old, baby: 1 year old
+· Goals: Clear out unused baby items, easy-to-use platform, sell quickly without posting to multiple groups
+· Pain points: No time, worried no one will buy, afraid of scams, unsure how to price items
+
+Buyer — Praew
+· Office employee, 28 years old, baby: 3 months old
+· Goals: Save money on baby essentials, find reliable secondhand items (car seat, breast pump)
+· Pain points: Unsure if items are clean, wastes time in disorganised groups, wants better filters for age range and needs`
+      },
+      {
+        title: 'Solution',
+        body: `· Dedicated niche marketplace tailored to moms and kids
+· Trust-focused features: item condition disclosure, seller ratings
+· Age-range and category filters for easy discovery
+· Streamlined listing flow for busy sellers`
+      }
+    ],
+    outcomes: [
+      { n: '2', l: 'User Personas Defined' },
+      { n: '✓', l: 'Niche Marketplace Design' },
+      { n: '✓', l: 'Trust-focused Features' }
+    ],
+    tags: ['User Persona', 'Marketplace UX', 'Mobile Design', 'Figma'],
+    prev: 'wash2go', next: 'ohotokyo'
+  },
+
+  /* ─── 10 · OHO! TOKYO BRANDING ───────────────────── */
+  ohotokyo: {
+    id: 'ohotokyo', img: 'img/ohotokyo.png', tc: 't3',
+    gallery: ['img/ohotokyo.png', 'img/ohotokyo_2.png', 'img/ohotokyo_3.png'],
+    cat: 'BRANDING · LOGO · PART-TIME GRAPHIC DESIGNER',
+    title: 'Oho! Tokyo Roll Pancake Shop',
+    summary: 'Brand identity design for a roll pancake shop — โอ้โห! โตเกียว (Oho! Tokyo). Created during a part-time role as Graphic Designer at Overprint Shop. Deliverables include logo design, nametag / business card, paper bag packaging with sticker labels, and a full printed menu.',
+    role: 'Graphic Designer',
+    duration: 'Part-time · Overprint Shop (Oct – Dec 2022)',
+    tools: 'Adobe Illustrator',
+    sections: [
+      {
+        title: 'About the Project',
+        body: `Brand identity design for a roll pancake shop. Designed during a part-time role at Overprint Shop.
+
+Design deliverables: Logo · Nametag / Business Card · Paper Bag & Sticker Labels · Full Printed Menu
+
+Colour Palette: #f52544 · #f46d7f · #f6b8a2`
+      },
+      {
+        title: 'Solution',
+        body: `· Developed a distinctive mascot-based logo featuring a wide-eyed illustrated character with a Japanese aesthetic and bold typography combining Thai and English
+· Applied the identity consistently across all brand touchpoints:
+   – Business card / Nametag
+   – Paper bag packaging with branded sticker labels
+   – Full printed food menu with product photos`
+      },
+      {
+        title: 'Outcome',
+        body: `· A cohesive, vibrant brand identity that brings personality and consistency to the shop
+· All 3 deliverables completed: Logo, Nametag, and Menu
+· Print-ready assets delivered for immediate production use`
+      }
+    ],
+    outcomes: [
+      { n: '3', l: 'Deliverables (Logo, Nametag, Menu)' },
+      { n: '✓', l: 'Character-driven Identity' },
+      { n: '✓', l: 'Print-ready Assets' }
+    ],
+    tags: ['Logo Design', 'Brand Identity', 'Graphic Design', 'Adobe Illustrator'],
+    prev: 'mamaloop', next: 'motion'
+  },
+
+  /* ─── 11 · MOTION GRAPHICS COLLECTION ───────────── */
+  motion: {
+    id: 'motion', img:null, tc: 't5',
+    gallery: ['img/motion.png', 'img/motion_2.png', 'img/motion_3.png'],
+    videos: [
+      { label: 'Open House of FIET', url: 'https://drive.google.com/file/d/1SWdM3EUdrGDc6ANX2G44sRwWCMSYGpAr/view?usp=drive_link' },
+      { label: 'Fast Fashion Awareness', url: 'https://drive.google.com/file/d/12-aMbYu2JX6ccZt2Ka3aYjgwoOeG1q0Q/view?usp=drive_link' },
+      { label: 'Motion Live Streaming · Thesis Exhibition', url: 'https://drive.google.com/file/d/1HHZjsvNJxlr2I8O3SvU0JW7PAiZUZ-_q/view?usp=drive_link' }
+    ],
+    cat: 'MOTION GRAPHIC · CLASS & EXTRACURRICULAR',
+    title: 'Motion Graphics Collection',
+    summary: 'A collection of motion graphic works created across various contexts — from faculty open house reels and awareness campaigns to student union loop animations and live streaming visuals for thesis exhibitions. Each piece combines storytelling, timing, and visual design to communicate messages through movement.',
+    role: 'Motion Designer',
+    duration: 'Class Projects & Extracurricular · KMUTT',
+    tools: 'Adobe After Effects, Adobe Premiere Pro',
+    video: "https://drive.google.com/file/d/FILE_ID/view?usp=sharing",
+    sections: [
+      {
+        title: 'Works Overview',
+        body: `1. Open House of FIET
+   · Motion reel for Faculty of Industrial Education and Technology open house
+   · Designed to attract incoming students with energetic, on-brand animations
+
+2. Fast Fashion Awareness
+   · Class project raising awareness about environmental impact of fast fashion
+   · Kinetic typography and data-driven visuals to drive emotional impact
+
+3.  Motion Live Streaming
+   · Animated overlays and lower-thirds for thesis exhibition live stream
+   · Designed for clarity and legibility during real-time broadcast`
+      },
+      {
+        title: 'Design Approach',
+        body: `· Each piece started with a clear communication goal — inform, excite, or raise awareness
+· Timing and easing curves were treated as design decisions, not just technical settings
+· Colour palettes and typography were matched to the context of each project
+· Looping works were optimised for seamless playback on event screens`
+      }
+    ],
+    outcomes:null,
+    tags: ['After Effects', 'Motion Design', 'Animation', 'Kinetic Typography', 'Adobe Premiere Pro'],
+    prev: 'ohotokyo', next: 'automotive'
+  }
+
+}; /* end PD */
+
+/* ── LIGHTBOX ─────────────────────────────────── */
+let lbImages = [], lbIndex = 0;
+
+function openLightbox(images, index) {
+  lbImages = images;
+  lbIndex = index;
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  const counter = document.getElementById('lightboxCounter');
+  img.src = images[index];
+  counter.textContent = (index + 1) + ' / ' + images.length;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lightboxNav(dir) {
+  lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+  const img = document.getElementById('lightboxImg');
+  const counter = document.getElementById('lightboxCounter');
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = lbImages[lbIndex];
+    img.style.opacity = '1';
+    counter.textContent = (lbIndex + 1) + ' / ' + lbImages.length;
+  }, 150);
+}
+
+document.getElementById('lightbox').addEventListener('click', function (e) {
+  if (e.target === this) closeLightbox();
+});
+
+document.addEventListener('keydown', function (e) {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') lightboxNav(1);
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
+});
+
+/* ── ROUTING ──────────────────────────────────── */
+function goTo(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  setTimeout(initReveal, 80);
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function navGoTo(pageName, sectionId) {
+  const currentPage = document.querySelector('.page.active');
+  const isAlreadyHome = currentPage && currentPage.id === 'page-' + pageName;
+  closeMobile();
+  if (isAlreadyHome) {
+    scrollToSection(sectionId);
+  } else {
+    goTo(pageName);
+    setTimeout(() => scrollToSection(sectionId), 120);
+  }
+}
+
+function closeMobile() { document.getElementById('mobileNav').classList.remove('open'); }
+
+/* ── OPEN PROJECT ─────────────────────────────── */
+function openProj(id) {
+  const p = PD[id];
+  if (!p) return;
+  const galleryImgs = p.gallery || [p.img, p.img, p.img];
+
+  /* Hero section */
+  document.getElementById('pdHero').innerHTML = `
+    <div>
+      <div class="proj-cat-tag">${p.cat}</div>
+      <h1 class="proj-big-title">${p.title}</h1>
+      <p class="proj-summary-text">${p.summary}</p>
+      <div class="proj-meta-row">
+        <div class="proj-meta-item"><div class="meta-label">ROLE</div><div class="meta-val">${p.role}</div></div>
+        <div class="proj-meta-item"><div class="meta-label">CONTEXT</div><div class="meta-val">${p.duration}</div></div>
+        <div class="proj-meta-item"><div class="meta-label">TOOLS</div><div class="meta-val">${p.tools}</div></div>
+      </div>
+      ${p.link ? `
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.5rem">
+          ${p.link.map(l => `<a href="${l.url}" target="_blank" class="btn-primary">${l.label}</a>`).join('')}
+        </div>` : ''}
+    </div>
+    ${p.img ? `
+    <div class="proj-cover-box ${p.tc}">
+      <img src="${p.img}" alt="${p.title}" onerror="this.style.display='none'">
+    </div>
+` : ''}`;
+
+  /* Gallery */
+  const g = galleryImgs;
+  const hasThree = g.length >= 3;
+  const galleryHTML = `
+    <div class="proj-gallery">
+      <div class="proj-gallery-main" onclick="openLightbox(currentGallery, 0)" style="cursor:zoom-in">
+        <img src="${g[0] || ''}" alt="Screenshot 1" onerror="this.style.display='none'">
+      </div>
+      ${g.length >= 2 ? `
+      <div class="proj-gallery-row" style="${hasThree ? '' : 'grid-template-columns:1fr'}">
+        <div class="proj-gallery-thumb" onclick="openLightbox(currentGallery, 1)" style="cursor:zoom-in">
+          <img src="${g[1]}" alt="Screenshot 2" onerror="this.style.display='none'">
+        </div>
+        ${hasThree ? `
+        <div class="proj-gallery-thumb" onclick="openLightbox(currentGallery, 2)" style="cursor:zoom-in">
+          <img src="${g[2]}" alt="Screenshot 3" onerror="this.style.display='none'">
+        </div>` : ''}
+      </div>` : ''}
+    </div>`;
+
+  window.currentGallery = g;
+
+  /* ── Body sections — dynamic from sections[] ── */
+  const sectionsHTML = p.sections.map(s => `
+    <div class="proj-section">
+      <div class="proj-sec-title">${s.title}</div>
+      <p class="proj-sec-body">${s.body}</p>
+    </div>`).join('');
+
+  document.getElementById('pdBody').innerHTML = `
+    ${sectionsHTML}
+    ${p.videos || p.gallery ? `
+<div class="proj-section">
+
+  <div class="proj-sec-title">
+    ${p.videos ? 'Video Works' : 'Project Gallery'}
+  </div>
+
+  ${p.videos ? `
+    <div class="video-grid">
+      ${p.videos.map(v => `
+        <div class="video-item">
+          <div class="video-label">${v.label}</div>
+
+          <div class="video-wrap">
+            <iframe
+              src="${getEmbedVideo(v.url)}"
+              title="${v.label}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy">
+            </iframe>
+          </div>
+
+        </div>
+      `).join('')}
+    </div>
+  ` : galleryHTML}
+
+</div>
+` : ''}
+    ${p.outcomes ? `
+<div class="proj-section">
+  <div class="proj-sec-title">Outcomes</div>
+
+  <div class="outcomes-grid">
+    ${p.outcomes.map(o => `
+      <div class="outcome-card">
+        <div class="outcome-num">${o.n}</div>
+        <div class="outcome-label">${o.l}</div>
+      </div>
+    `).join('')}
+  </div>
+</div>
+` : ''}
+    </div>
+    <div class="proj-section">
+      <div class="proj-sec-title">Skills &amp; Tools</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem">
+        ${p.tags.map(t => `<span class="chip">${t}</span>`).join('')}
+      </div>
+    </div>`;
+
+  const pv = PD[p.prev], nx = PD[p.next];
+  document.getElementById('pdNav').innerHTML = `
+    <span class="page-link" onclick="openProj('${pv.id}')">← ${pv.title}</span>
+    <a class="btn-primary" onclick="navGoTo('home','work')">All Projects</a>
+    <span class="page-link" onclick="openProj('${nx.id}')">${nx.title} →</span>`;
+
+  goTo('project');
+}
+
+/* ── CURSOR ───────────────────────────────────── */
+const cDot = document.getElementById('cDot'), cRing = document.getElementById('cRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function loop() {
+  cDot.style.cssText += `;left:${mx}px;top:${my}px`;
+  rx += (mx - rx) * .12; ry += (my - ry) * .12;
+  cRing.style.cssText += `;left:${rx}px;top:${ry}px`;
+  requestAnimationFrame(loop);
+})();
+document.addEventListener('mouseover', e => {
+  const t = e.target.closest('a,button,.project-card,.chip,.filter-btn,.process-step,.contact-link,.page-link,.proj-cta-hint,.proj-gallery-main,.proj-gallery-thumb');
+  document.body.classList.toggle('chover', !!t);
+});
+
+/* ── NAV SCROLL ───────────────────────────────── */
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60), { passive: true });
+
+/* ── SCROLL REVEAL ────────────────────────────── */
+function initReveal() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
+}
+initReveal();
+
+/* ── PROJECT FILTER (homepage) ───────────────── */
+function filterProj(cat, btn) {
+  document.querySelectorAll('#projGrid .filter-btn, .work-filter .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#projGrid .project-card').forEach(c => {
+    const show = cat === 'all' || c.dataset.cat === cat;
+    c.style.display = show ? 'block' : 'none';
+  });
+}
+
+/* ── ALL WORK FILTER ─────────────────────────── */
+function filterAll(type, btn) {
+  document.querySelectorAll('#page-allwork .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#allProjGrid .project-card').forEach(card => {
+    if (type === 'all') {
+      card.style.display = 'block';
+    } else {
+      card.style.display = card.dataset.type === type ? 'block' : 'none';
+    }
+  });
+}
+
+function getEmbedVideo(url) {
+
+  // YouTube
+  if (url.includes("youtube.com") || url.includes("youtu.be")) {
+
+    let videoId = "";
+
+    if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1].split("?")[0];
+    } else {
+      videoId = new URL(url).searchParams.get("v");
+    }
+
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  // Google Drive
+  if (url.includes("drive.google.com")) {
+
+    const match = url.match(/\/d\/(.*?)\//);
+
+    if (match && match[1]) {
+      return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+  }
+
+  return url;
+
+}
+</script>
+</body>
+</html>
